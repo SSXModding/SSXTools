@@ -33,7 +33,7 @@ struct ShpsHeader {
 	char ErtsMagic[4];
 
 	// Garbage data
-	std::uint16_t Garbage;
+	std::uint32_t Garbage;
 
 	// Image width
 	std::uint16_t ImageWidth;

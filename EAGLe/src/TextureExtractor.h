@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 #include <exception>
 #include <fstream>
 #include "eagl_ps2.h"
@@ -9,6 +10,7 @@
 class TextureExtractor {
 	std::istream& m_stream;
 	ShpsHeader m_header;
+	std::vector<char> m_textureData;
 public:
 	TextureExtractor(std::istream& stream) : m_stream(stream) {}
 

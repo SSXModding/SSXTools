@@ -2,7 +2,6 @@
 #include "utility.h"
 #include "TextureExtractor.h"
 
-// Test for a valid SHPS/SSH header
 bool CheckValidHeader(ShpsHeader& header) {
 	// tools already exist for .FSH
 	if (!strncmp(header.Magic, "SHPS", 3)) { 
@@ -36,13 +35,35 @@ bool CheckValidHeader(ShpsHeader& header) {
 
 void TextureExtractor::Extract() {
 	ReadStruct<ShpsHeader>(m_stream, m_header);
+	
 	if (!CheckValidHeader(m_header))
-		throw std::exception("SSH header invalid");
+		throw std::invalid_argument("EAGL SSH header invalid");
 
-	std::cout << "EAGL Texture Info:\n";
-	std::cout << "File Size: " << m_header.FileLength << '\n';
+	std::cout << "Texture Info:" << '\n';
+	
+	std::cout << "File size: " << m_header.FileLength << "bytes" << '\n';
 	std::cout << "Texture Format Version: " << m_header.FileVersion << '\n';
-	std::cout << "Filecode: "; PrintFixedArray(m_header.FileName, sizeof(m_header.FileName), std::cout); std::cout << '\n';
+	
+	std::cout << "File code: "; 
+	PrintFixedArray(m_header.FileName, sizeof(m_header.FileName), std::cout); 
+	std::cout << '\n';
 
-	std::cout << "Image Size: " << m_header.ImageWidth << 'x' << m_header.ImageHeight << '\n';
+	std::cout << "Image size: " << m_header.ImageWidth << 'x' << m_header.ImageHeight << '\n';
+	
+	std::cout << "Getting texture data\n";
+
+	m_textureData.resize(m_header.FileLength - sizeof(ShpsHeader));
+
+	char byte;
+	while (!m_stream.eof()) {
+		m_stream.read(&byte, sizeof(char));
+		m_textureData.push_back(byte);
+	}
+
+
+	std::cout << "Texture data output:\n";
+	for (char& c : m_textureData) {
+		std::cout << c;
+	}
+	std::cout << '\n';
 }
