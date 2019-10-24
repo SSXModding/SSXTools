@@ -4,7 +4,7 @@
 #include <vector>
 #include <exception>
 #include <fstream>
-#include "eagl_ps2.h"
+#include "ShpsHeader.h"
 
 // Extracts texture from STL stream.
 class TextureExtractor {

@@ -6,22 +6,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\eagl_ps2.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TextureExtractor.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utility.h">
-      <Filter>src</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\TextureExtractor.cpp">
       <Filter>src</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ShpsHeader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureExtractor.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UtilStuff.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

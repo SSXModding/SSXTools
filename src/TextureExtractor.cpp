@@ -1,5 +1,5 @@
 #include <cstring>
-#include "utility.h"
+#include "UtilStuff.h"
 #include "TextureExtractor.h"
 
 bool CheckValidHeader(ShpsHeader& header) {

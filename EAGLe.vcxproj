@@ -19,13 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\eagl_ps2.h" />
-    <ClInclude Include="src\TextureExtractor.h" />
-    <ClInclude Include="src\utility.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TextureExtractor.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ShpsHeader.h" />
+    <ClInclude Include="src\TextureExtractor.h" />
+    <ClInclude Include="src\UtilStuff.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
