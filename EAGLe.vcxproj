@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="COPYING" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TextureExtractor.cpp" />
   </ItemGroup>
@@ -29,6 +28,7 @@
     <ClInclude Include="src\UtilStuff.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="COPYING" />
     <None Include="Makefile" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

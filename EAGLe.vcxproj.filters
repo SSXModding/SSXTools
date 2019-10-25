@@ -12,7 +12,6 @@
     <ClCompile Include="src\TextureExtractor.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="COPYING" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ShpsHeader.h">
@@ -27,5 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
+    <None Include="COPYING" />
   </ItemGroup>
 </Project>
