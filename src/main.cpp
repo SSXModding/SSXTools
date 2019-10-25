@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	std::ifstream stream(argv[1]);
+	std::ifstream stream(argv[1], std::ifstream::in | std::ifstream::binary);
 
 	TextureExtractor extractor(stream);
 	try {

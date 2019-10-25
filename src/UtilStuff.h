@@ -12,4 +12,17 @@ inline void ReadStruct(std::istream& stream, Struct& st) {
 	memmove(&st, &buf[0], sizeof(Struct));
 }
 
-#define PrintFixedArray(a, size, os) for(auto i = 0u; i < size; ++i) os << a[i];
+// Print a char array's contents explicitly until the end of the array.
+#define PrintFixedArray(a, size, os)	{									\
+											std::stringstream ss;			\
+											for(auto i = 0u; i < size; ++i) \
+												ss << a[i];					\
+											os << ss.str();					\
+											ss.clear();						\
+										}
+
+// strncmp() alias for readability
+#define SizedCmp(a,b) !strncmp(a, b, sizeof(a))
+
+// strncmp() alias for readability that accepts a amount to take away from sizeof
+#define SizedCmpOff(a,b,off) !strncmp(a, b, sizeof(a)-off)

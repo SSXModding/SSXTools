@@ -1,11 +1,11 @@
 #include <cstring>
+#include <sstream>
 #include "UtilStuff.h"
 #include "TextureExtractor.h"
 
 bool CheckValidHeader(ShpsHeader& header) {
 	// tools already exist for .FSH
-	if (!strncmp(header.Magic, "SHPS", 3)) { 
-
+	if (SizedCmp(header.Magic, "SHPS")) { 
 		switch (header.FileVersion) {
 			default:
 				return false;
@@ -15,9 +15,9 @@ bool CheckValidHeader(ShpsHeader& header) {
 			break;
 		}
 
-		if (!strncmp(header.FileMagic, "GIMX", 4)) {
-			if (!strncmp(header.GroupName, "Buy", 3)) {
-				if (!strncmp(header.ErtsMagic, "ERTS", 4)) {
+		if (SizedCmp(header.FileMagic, "GIMX")) {
+			if (SizedCmpOff(header.GroupName, "Buy", 1)) {
+				if (SizedCmp(header.ErtsMagic, "ERTS")) {
 					return true;
 				} else {
 					return false;
@@ -40,8 +40,7 @@ void TextureExtractor::Extract() {
 		throw std::invalid_argument("EAGL SSH header invalid");
 
 	std::cout << "Texture Info:" << '\n';
-	
-	std::cout << "File size: " << m_header.FileLength << "bytes" << '\n';
+	std::cout << "File size: " << m_header.FileLength << " bytes" << '\n';
 	std::cout << "Texture Format Version: " << m_header.FileVersion << '\n';
 	
 	std::cout << "File code: "; 
@@ -49,21 +48,17 @@ void TextureExtractor::Extract() {
 	std::cout << '\n';
 
 	std::cout << "Image size: " << m_header.ImageWidth << 'x' << m_header.ImageHeight << '\n';
-	
 	std::cout << "Getting texture data\n";
 
-	m_textureData.resize(m_header.FileLength - sizeof(ShpsHeader));
-
-	char byte;
-	while (!m_stream.eof()) {
-		m_stream.read(&byte, sizeof(char));
-		m_textureData.push_back(byte);
+	if (!m_stream.eof()) {
+		std::stringstream stream;
+		stream << m_stream.rdbuf();
+		std::string content = stream.str();
+		m_textureData = std::vector<char>(content.begin(), content.end());
+		stream.clear();
 	}
-
 
 	std::cout << "Texture data output:\n";
-	for (char& c : m_textureData) {
-		std::cout << c;
-	}
+	std::cout << m_textureData.data();
 	std::cout << '\n';
 }
