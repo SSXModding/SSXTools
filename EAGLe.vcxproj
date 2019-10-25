@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="COPYING" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TextureExtractor.cpp" />
   </ItemGroup>
@@ -26,6 +27,9 @@
     <ClInclude Include="src\ShpsHeader.h" />
     <ClInclude Include="src\TextureExtractor.h" />
     <ClInclude Include="src\UtilStuff.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
