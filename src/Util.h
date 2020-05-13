@@ -116,25 +116,6 @@ namespace core {
 		memcpy(&buf[(index * sizeof(T))], &out, sizeof(T));
 		return true;
 	}
-
-	/**
-	 * Print a fixed array of type T.
-	 *
-	 * \tparam T Type of the array.
-	 * \tparam size Size of the array.
-	 *
-	 * \param[out] os Stream to write to.
-	 * \param[in] arr Array.
-	 */
-	template<class T, uint32 size = 0>
-	inline void PrintFixedArray(std::ostream& os, T arr[size]) {
-		std::stringstream ss;
-		for(uint32 i = 0; i < size; ++i)
-			ss << (char)arr[i];
-
-		os << ss.str();
-		ss.clear();
-	}
 	
 	/**
 	 * Compare two objects of type T or 
