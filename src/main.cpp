@@ -33,25 +33,30 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	eagle::core::ShpsReader reader(stream, filename);
+	ShpsReader reader(stream, filename);
 
 	try {
 		reader.ReadHeader();
 		reader.ReadTOC();
 
-		eagle::core::ShpsFileHeader header = reader.GetHeader();
+		ShpsFileHeader& header = reader.GetHeader();
 
 		std::cout << "SSH Info:" << '\n';
 		std::cout << "File size: " << (float)header.FileLength/1000 << " kBytes" << '\n';
 		std::cout << "Image count: " << header.FileTextureCount << " files" << '\n';
 
-		for(uint32 i = 0; i < reader.GetHeader().FileTextureCount; ++i) {
+		for(uint32 i = 0; i < header.FileTextureCount; ++i) {
 			reader.ReadImage(i);
-			eagle::core::ShpsImage& image = reader.GetImages()[i];
+		}
 
-			std::cout << "Texture information:\n";
+		for(uint32 i = 0; i < header.FileTextureCount; ++i) {
+			auto& images = reader.GetImages();
+			ShpsImage& image = images[i];
+
+			std::cout << "Dumping texture " << i << "...\n";
+
+			std::cout << "Texture " << i << " information:\n";
 			std::cout << "WxH: " << image.width << 'x' << image.height << '\n';
-			std::cout << "Image size: " << (float)(image.width * image.height)/1000 << "kBytes\n";
 
 			if(image.format == eagle::core::ShpsImageType::Lut256) {
 				std::cout << "Image is an 8bpp image\n";
@@ -63,7 +68,7 @@ int main(int argc, char** argv) {
 			sshname.replace(sshname.find_first_of(".SSH"), sshname.find_first_of(".SSH") - sshname.length(), "");
 
 			// TODO: compose a path with std::filesystem instead of this garbage
-			std::string filename = sshname + "_" + std::to_string(i) + ".png";
+			std::string outfilename = sshname + "_" + std::to_string(i) + ".png";
 			std::vector<byte> imageData;
 
 			imageData.resize(image.width * image.height * CHANNEL_COUNT);
@@ -83,13 +88,14 @@ int main(int argc, char** argv) {
 			}
 
 			// Write the PNG.
-			stbi_write_png(filename.c_str(), image.width, image.height, 3, imageData.data(), image.width * CHANNEL_COUNT);
+			stbi_write_png(outfilename.c_str(), image.width, image.height, 3, imageData.data(), image.width * CHANNEL_COUNT);
+			std::cout << "PNG written at " << outfilename << ".\n";
 			imageData.clear();
 		}
 
-		std::cout << "Finished extraction, doing some cleanup\n";
+		std::cout << "Finished extraction, cleaning up...\n";
 
-		for(eagle::core::ShpsImage& image : reader.GetImages()) {
+		for(ShpsImage& image : reader.GetImages()) {
 			if(!image.palette.empty())
 				image.palette.clear();
 			
