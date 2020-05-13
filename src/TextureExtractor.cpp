@@ -10,52 +10,49 @@
 namespace eagle {
 namespace core {
 
-// check for a valid header
-bool TextureExtractor::CheckValidHeader(const ShpsFileHeader& header) {
-	if(SizedCmp(header.Magic, "SHPS")) {
-		auto tellLength = [&]() -> uint32 {
-			uint32 oldpos = stream.tellg();
-			stream.seekg(0, std::istream::end);
+	bool TextureExtractor::CheckValidHeader(const ShpsFileHeader& header) {
+		if(SizedCmp(header.Magic, "SHPS")) {
+			auto tellLength = [&]() -> uint32 {
+				uint32 oldpos = stream.tellg();
+				stream.seekg(0, std::istream::end);
+	
+				uint32 pos = stream.tellg();
+				stream.seekg(oldpos, std::istream::beg);
+				return pos;
+			};
 
-			uint32 pos = stream.tellg();
-			stream.seekg(oldpos, std::istream::beg);
-			return pos;
-		};
-
-		if(tellLength() == header.FileLength) {
-			return true;
+			if(tellLength() == header.FileLength) {
+				return true;
+			} else {
+				return false;
+			}
 		} else {
 			return false;
 		}
-	} else {
-		return false;
 	}
-}
 
-void TextureExtractor::ReadHeader() {
-	ReadFromStream(stream, header);
+	void TextureExtractor::ReadHeader() {
+		ReadFromStream(stream, header);
 
-	if(!CheckValidHeader(header))
-		throw std::invalid_argument("EAGL SSH header invalid");
-}
-
-void TextureExtractor::ReadTOC() {
-	std::cout << "SSH Info:" << '\n';
-	std::cout << "File size: " << header.FileLength/1000 << " kBytes" << '\n';
-	std::cout << "Image count: " << header.FileTextureCount << " files" << '\n';
-
-	for(uint32 i = 0; i < header.FileTextureCount; ++i) {
-		ShpsTocEntry entry;
-		ReadFromStream(stream, entry);
-
-		toc.push_back(entry);
+		if(!CheckValidHeader(header))
+			throw std::invalid_argument("EAGL SSH header invalid");
 	}
-}
+
+	void TextureExtractor::ReadTOC() {
+		for(uint32 i = 0; i < header.FileTextureCount; ++i) {
+			ShpsTocEntry entry;
+			ReadFromStream(stream, entry);
+
+			toc.push_back(entry);
+		}
+	}
 
 	ShpsImage TextureExtractor::ReadImage(int imageIndex) {
+		if(imageIndex > toc.size())
+			return {};
+
 		ShpsTocEntry& e = toc[imageIndex];
 		ShpsImage image;
-		std::cout << "Starting texture " << imageIndex << " extraction\n";
 
 		stream.seekg(e.StartOffset, std::istream::beg);
 
@@ -67,13 +64,6 @@ void TextureExtractor::ReadTOC() {
 		if(image.format == ShpsImageType::Lut256) {
 			// 1 byte per pixel so size is w*h
 			size = image.width * image.height;
-		}
-
-		std::cout << "Texture information:\n";
-		std::cout << "WxH: " << image.width << 'x' << image.height << '\n';
-		std::cout << "Image size: " << size/1000 << "kBytes\n";
-		if(image.format == ShpsImageType::Lut256) {
-			std::cout << "Image is an 8bpp image\n";
 		}
 
 		image.data.resize(size);
@@ -95,7 +85,6 @@ void TextureExtractor::ReadTOC() {
 			for(int i = 0; i < 256; ++i) {
 				Shps8bppRgba color;
 				ReadFromStream(stream, color);
-				//color.color.total = eagle::core::EndianSwap(color.color.total);
 				image.palette[i] = color;
 			}
 		}
@@ -105,24 +94,30 @@ void TextureExtractor::ReadTOC() {
 		return image;
 	}
 
+	// TODO(modeco80): See if I can get alpha to work
+	// Alpha is stored in every palette but adding it to the image makes it break
 	void TextureExtractor::WriteImage(int index) {
-		// BGRA == 4 channel
+		if(index > toc.size())
+			return;
+
 		constexpr int32 CHANNEL_COUNT = 3;
 		ShpsImage image = images[index];
 
 		std::string sshname = GetFileName();
 		sshname.replace(sshname.find_first_of(".SSH"), sshname.find_first_of(".SSH") - sshname.length(), "");
 
+		// TODO: compose a path with std::filesystem instead of this garbage
 		std::string filename = sshname + "_" + std::to_string(index) + ".png";
 		std::vector<byte> imageData;
 
+		imageData.resize(image.width * image.height * CHANNEL_COUNT);
+
+		// Specific to lut256 images
 		if(image.format == ShpsImageType::Lut256) {
-			imageData.resize(image.width * image.height * CHANNEL_COUNT);
 
 			byte* ptr = imageData.data();
 			byte* texel = image.data.data();
 			for(int i = 0; i < image.width * image.height; ++i) {
-				
 					*(ptr++) = image.palette[*(texel)].color.b;
 					*(ptr++) = image.palette[*(texel)].color.g;
 					*(ptr++) = image.palette[*(texel)].color.r;
@@ -131,6 +126,7 @@ void TextureExtractor::ReadTOC() {
 		}
 
 		stbi_write_png(filename.c_str(), image.width, image.height, 3, imageData.data(), image.width * CHANNEL_COUNT);
+		imageData.clear();
 	}
 
 }

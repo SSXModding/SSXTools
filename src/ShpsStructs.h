@@ -5,12 +5,8 @@
 namespace eagle {
 namespace core {
 
-// File type for SSX (2000).
-constexpr static char FileType_SSX1[] = "GIMX";
-
-
-// Mark unknown data with a specific size
-#define unknown(suffix, size) char garbage##suffix[size];
+	// File type for SSX (2000).
+	constexpr static char FileType_SSX1[] = "GIMX";
 
 	// Header of SHPS image
 	struct ShpsFileHeader {
@@ -34,7 +30,6 @@ constexpr static char FileType_SSX1[] = "GIMX";
 		uint32 StartOffset;
 	};
 
-
 	// This is taken from the first uint16 in ShpsImageHeader.
 	// These seem to stay the same for certain image types.
 	enum ShpsImageType : uint32 {
@@ -49,8 +44,6 @@ constexpr static char FileType_SSX1[] = "GIMX";
 		// 32bpp, no LUT
 		NonLut32Bpp = 0x1005
 	};
-
-	
 
 	struct ShpsImageHeader {
 		uint16 format;
@@ -67,8 +60,6 @@ constexpr static char FileType_SSX1[] = "GIMX";
 
 		// image data starts after this
 	};
-
-
 
 	struct ShpsPaletteHeader {
 		// This is mostly used as a marker.
@@ -108,8 +99,6 @@ constexpr static char FileType_SSX1[] = "GIMX";
 	};
 
 	struct ShpsImage : public ShpsImageHeader {
-
-
 		std::vector<byte> data;
 
 		// Used if image is LUT256.

@@ -17,27 +17,46 @@ namespace core {
 			  filename(filename) {
 		
 		}
-
+		
+		/**
+		 * Read the SHPS header.
+		 */
 		void ReadHeader();
 
+		/**
+		 * Read the Table Of Contents (TOC),
+		 * which contains the filecode of the file
+		 * and the start offset of the image.
+		 */
 		void ReadTOC();
 
+		/**
+		 * Check if a provided header is valid.
+		 *
+		 * \param[in] header File header to check.
+		 */
 		bool CheckValidHeader(const ShpsFileHeader& header);
 		
+		/**
+		 * Read a image at the provided TOC index.
+		 *
+		 * \param[in] index Index to read.
+		 */
 		ShpsImage ReadImage(int imageIndex);
 
 		/**
-		 * Write an image.
+		 * Read a image at the provided TOC index.
+		 *
+		 * \param[in] Index of image to write.
 		 */
 		void WriteImage(int index);
 		
 		/**
-		 * Get the file header
+		 * Get the file header.
 		 */
 		EAGLE_GETTER(ShpsFileHeader, GetHeader) {
 			return header;
 		}
-
 
 		/**
 		 * Get the image TOC.
@@ -46,7 +65,9 @@ namespace core {
 			return toc;
 		}
 
-
+		/**
+		 * Get image count.
+		 */
 		EAGLE_GETTER(int, GetImageCount) {
 			return images.size();
 		}
@@ -74,9 +95,6 @@ namespace core {
 		ShpsFileHeader header{};
 		std::vector<ShpsTocEntry> toc;
 		std::vector<ShpsImage> images;
-
-
-
 	};
 
 }
