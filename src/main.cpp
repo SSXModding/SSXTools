@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 
 			constexpr int32 CHANNEL_COUNT = 3;
 
-			std::string sshname = reader.GetFileName();
+			std::string sshname = filename;
 			sshname.replace(sshname.find_first_of(".SSH"), sshname.find_first_of(".SSH") - sshname.length(), "");
 
 			// TODO: compose a path with std::filesystem instead of this garbage

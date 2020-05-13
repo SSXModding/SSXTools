@@ -50,14 +50,14 @@ namespace core {
 		/**
 		 * Get the file header.
 		 */
-		EAGLE_GETTER(ShpsFileHeader, GetHeader) {
+		EAGLE_GETTER(ShpsFileHeader&, GetHeader) {
 			return header;
 		}
 
 		/**
 		 * Get the image TOC.
 		 */
-		EAGLE_GETTER(std::vector<ShpsTocEntry>, GetTOC) {
+		EAGLE_GETTER(std::vector<ShpsTocEntry>&, GetTOC) {
 			return toc;
 		}
 
@@ -71,14 +71,14 @@ namespace core {
 		/**
 		 * Get all images.
 		 */
-		EAGLE_GETTER(std::vector<ShpsImage>, GetImages) {
+		EAGLE_GETTER(std::vector<ShpsImage>&, GetImages) {
 			return images;
 		}
 		
 		/**
 		 * Get the SSH filename.
 		 */
-		EAGLE_GETTER(std::string, GetFileName) {
+		EAGLE_GETTER(std::string&, GetFileName) {
 			return filename;
 		}
 
