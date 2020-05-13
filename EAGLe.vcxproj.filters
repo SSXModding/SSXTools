@@ -14,13 +14,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ShpsHeader.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\TextureExtractor.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\UtilStuff.h">
+    <ClInclude Include="src\ShpsStructs.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EndianSwap.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

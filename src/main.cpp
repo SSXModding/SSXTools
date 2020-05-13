@@ -16,14 +16,30 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	std::ifstream stream(argv[1], std::ifstream::in | std::ifstream::binary);
+	std::string filename(argv[1]);
+	std::ifstream stream(filename, std::ifstream::in | std::ifstream::binary);
 
-	TextureExtractor extractor(stream);
+	if(!stream) {
+		std::cout << "Could not open file for reading\n";
+		return 1;
+	}
+
+	eagle::core::TextureExtractor extractor(stream, filename);
+
 	try {
-		extractor.Extract();
+		extractor.ReadHeader();
+		extractor.ReadTOC();
+
+		for(int i = 0; i < extractor.GetHeader().FileTextureCount; ++i) {
+			extractor.ReadImage(i);
+			extractor.WriteImage(i);
+		}
+			
 	} catch (std::exception & e) {
 		std::cout << "Error: " << e.what() << '\n';
 		return 1;
 	}
+
+	stream.close();
 	return 0;
 }
