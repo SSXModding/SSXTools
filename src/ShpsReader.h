@@ -10,6 +10,8 @@ namespace eagle {
 namespace core {
 
 	/**
+	 * Reads SHPS (.ssh) files to data structures that can be serialized
+	 * to other formats easily.
 	 */
 	struct ShpsReader {
 
