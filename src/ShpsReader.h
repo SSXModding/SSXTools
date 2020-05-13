@@ -9,10 +9,11 @@
 namespace eagle {
 namespace core {
 
-	// Extracts texture from STL stream.
-	struct TextureExtractor {
-		TextureExtractor(std::istream& stream, 
-			std::string& filename) 
+	/**
+	 */
+	struct ShpsReader {
+
+		ShpsReader(std::istream& stream, std::string& filename) 
 			: stream(stream),
 			  filename(filename) {
 		
@@ -43,13 +44,6 @@ namespace core {
 		 * \param[in] index Index to read.
 		 */
 		ShpsImage ReadImage(int imageIndex);
-
-		/**
-		 * Read a image at the provided TOC index.
-		 *
-		 * \param[in] Index of image to write.
-		 */
-		void WriteImage(int index);
 		
 		/**
 		 * Get the file header.
@@ -68,7 +62,7 @@ namespace core {
 		/**
 		 * Get image count.
 		 */
-		EAGLE_GETTER(int, GetImageCount) {
+		EAGLE_GETTER(std::size_t, GetImageCount) {
 			return images.size();
 		}
 		

@@ -1,7 +1,13 @@
 #include <iostream>
 #include <exception>
 #include <fstream>
-#include "TextureExtractor.h"
+#include <string>
+#include "ShpsReader.h"
+
+#include "stb_image_write.h"
+
+
+using namespace eagle::core;
 
 void cli_usage(char* prog) {
 	std::cout << "EAGLe: Tool to extract EAGL .SSH textures\n";
@@ -27,35 +33,63 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-	eagle::core::TextureExtractor extractor(stream, filename);
+	eagle::core::ShpsReader reader(stream, filename);
 
 	try {
-		extractor.ReadHeader();
-		extractor.ReadTOC();
+		reader.ReadHeader();
+		reader.ReadTOC();
 
-		eagle::core::ShpsFileHeader header = extractor.GetHeader();
+		eagle::core::ShpsFileHeader header = reader.GetHeader();
 
 		std::cout << "SSH Info:" << '\n';
 		std::cout << "File size: " << (float)header.FileLength/1000 << " kBytes" << '\n';
 		std::cout << "Image count: " << header.FileTextureCount << " files" << '\n';
 
-		for(int i = 0; i < extractor.GetHeader().FileTextureCount; ++i) {
-			extractor.ReadImage(i);
-			eagle::core::ShpsImage& image = extractor.GetImages()[i];
+		for(uint32 i = 0; i < reader.GetHeader().FileTextureCount; ++i) {
+			reader.ReadImage(i);
+			eagle::core::ShpsImage& image = reader.GetImages()[i];
 
 			std::cout << "Texture information:\n";
 			std::cout << "WxH: " << image.width << 'x' << image.height << '\n';
 			std::cout << "Image size: " << (float)(image.width * image.height)/1000 << "kBytes\n";
+
 			if(image.format == eagle::core::ShpsImageType::Lut256) {
 				std::cout << "Image is an 8bpp image\n";
 			}
 
-			extractor.WriteImage(i);
+			constexpr int32 CHANNEL_COUNT = 3;
+
+			std::string sshname = reader.GetFileName();
+			sshname.replace(sshname.find_first_of(".SSH"), sshname.find_first_of(".SSH") - sshname.length(), "");
+
+			// TODO: compose a path with std::filesystem instead of this garbage
+			std::string filename = sshname + "_" + std::to_string(i) + ".png";
+			std::vector<byte> imageData;
+
+			imageData.resize(image.width * image.height * CHANNEL_COUNT);
+
+			// Specific to lut256 images
+			if(image.format == ShpsImageType::Lut256) {
+				byte* ptr = imageData.data();
+				byte* texel = image.data.data();
+
+				// Write the data to the image data we are going to write to the PNG
+				for(int i = 0; i < image.width * image.height; ++i) {
+						*(ptr++) = image.palette[*(texel)].color.b;
+						*(ptr++) = image.palette[*(texel)].color.g;
+						*(ptr++) = image.palette[*(texel)].color.r;
+						texel++;
+				}	
+			}
+
+			// Write the PNG.
+			stbi_write_png(filename.c_str(), image.width, image.height, 3, imageData.data(), image.width * CHANNEL_COUNT);
+			imageData.clear();
 		}
 
 		std::cout << "Finished extraction, doing some cleanup\n";
 
-		for(eagle::core::ShpsImage& image : extractor.GetImages()) {
+		for(eagle::core::ShpsImage& image : reader.GetImages()) {
 			if(!image.palette.empty())
 				image.palette.clear();
 			

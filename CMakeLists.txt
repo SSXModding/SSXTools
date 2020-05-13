@@ -5,8 +5,10 @@ project(EAGLe CXX)
 set(EAGLE_SOURCES
 	src/main.cpp
 
-	src/TextureExtractor.h
-	src/TextureExtractor.cpp
+	src/ShpsReader.h
+	src/ShpsReader.cpp
+
+	src/stb_implementation.cpp
 
 	src/Util.h
 	src/EndianSwap.h

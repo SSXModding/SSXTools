@@ -1,22 +1,19 @@
 #include <cstring>
 #include <sstream>
 #include "Util.h"
-#include "TextureExtractor.h"
 #include "EndianSwap.h"
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "ShpsReader.h"
 
 namespace eagle {
 namespace core {
 
-	bool TextureExtractor::CheckValidHeader(const ShpsFileHeader& header) {
+	bool ShpsReader::CheckValidHeader(const ShpsFileHeader& header) {
 		if(SizedCmp(header.Magic, "SHPS")) {
-			auto tellLength = [&]() -> uint32 {
-				uint32 oldpos = stream.tellg();
+			auto tellLength = [&]() {
+				auto oldpos = stream.tellg();
 				stream.seekg(0, std::istream::end);
 	
-				uint32 pos = stream.tellg();
+				auto pos = stream.tellg();
 				stream.seekg(oldpos, std::istream::beg);
 				return pos;
 			};
@@ -31,14 +28,14 @@ namespace core {
 		}
 	}
 
-	void TextureExtractor::ReadHeader() {
+	void ShpsReader::ReadHeader() {
 		ReadFromStream(stream, header);
 
 		if(!CheckValidHeader(header))
 			throw std::invalid_argument("EAGL SSH header invalid");
 	}
 
-	void TextureExtractor::ReadTOC() {
+	void ShpsReader::ReadTOC() {
 		for(uint32 i = 0; i < header.FileTextureCount; ++i) {
 			ShpsTocEntry entry;
 			ReadFromStream(stream, entry);
@@ -47,7 +44,7 @@ namespace core {
 		}
 	}
 
-	ShpsImage TextureExtractor::ReadImage(int imageIndex) {
+	ShpsImage ShpsReader::ReadImage(int imageIndex) {
 		if(imageIndex > toc.size())
 			return {};
 
@@ -58,7 +55,6 @@ namespace core {
 
 		ReadFromStream<ShpsImageHeader>(stream, image);
 
-		uint32 start = stream.tellg();
 		uint32 size;
 
 		if(image.format == ShpsImageType::Lut256) {
@@ -92,41 +88,6 @@ namespace core {
 		// Add the image now that we've got its data.
 		images.push_back(image);
 		return image;
-	}
-
-	// TODO(modeco80): See if I can get alpha to work
-	// Alpha is stored in every palette but adding it to the image makes it break
-	void TextureExtractor::WriteImage(int index) {
-		if(index > toc.size())
-			return;
-
-		constexpr int32 CHANNEL_COUNT = 3;
-		ShpsImage image = images[index];
-
-		std::string sshname = GetFileName();
-		sshname.replace(sshname.find_first_of(".SSH"), sshname.find_first_of(".SSH") - sshname.length(), "");
-
-		// TODO: compose a path with std::filesystem instead of this garbage
-		std::string filename = sshname + "_" + std::to_string(index) + ".png";
-		std::vector<byte> imageData;
-
-		imageData.resize(image.width * image.height * CHANNEL_COUNT);
-
-		// Specific to lut256 images
-		if(image.format == ShpsImageType::Lut256) {
-
-			byte* ptr = imageData.data();
-			byte* texel = image.data.data();
-			for(int i = 0; i < image.width * image.height; ++i) {
-					*(ptr++) = image.palette[*(texel)].color.b;
-					*(ptr++) = image.palette[*(texel)].color.g;
-					*(ptr++) = image.palette[*(texel)].color.r;
-					texel++;
-			}	
-		}
-
-		stbi_write_png(filename.c_str(), image.width, image.height, 3, imageData.data(), image.width * CHANNEL_COUNT);
-		imageData.clear();
 	}
 
 }
