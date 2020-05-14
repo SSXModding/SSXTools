@@ -19,6 +19,19 @@ On Windows you can also use Visual Studio's CMake tools.
 
 Simply do `path/to/eagle ssh_path` and EAGLe will do its magic! (TODO this will change)
 
+### Using SHPSCore in your own projects
+
+Include SHPSCore like so...
+```cmake
+set(EAGLE_SHPSCORE_ONLY ON)
+add_subdirectory(path/to/vendor/eagle)
+```
+
+and link with it like...
+```cmake
+target_link_libraries(project shpscore)
+```
+
 ### Checklist
 
 - [x] SSH header loading
