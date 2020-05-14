@@ -48,14 +48,15 @@ namespace core {
 		if(imageIndex > toc.size())
 			return {};
 
-		ShpsTocEntry& e = toc[imageIndex];
+		ShpsTocEntry& tocEntry = toc[imageIndex];
 
 		ShpsImage image;
 		image.index = imageIndex;
+		image.toc_entry = tocEntry;
 
 		uint32 size{};
 
-		stream.seekg(e.StartOffset, std::istream::beg);
+		stream.seekg(tocEntry.StartOffset, std::istream::beg);
 
 		ReadFromStream<ShpsImageHeader>(stream, image);
 
