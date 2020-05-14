@@ -9,8 +9,8 @@
 using namespace eagle::core;
 
 void cli_usage(char* prog) {
-	std::cout << "EAGLe: Tool to extract EAGL .SSH textures\n";
-	std::cout << "2019 modeco80 under the MIT License\n";
+	std::cout << "EAGLe: Tool to convert EAGL .SSH texture banks to .PNG files.\n";
+	std::cout << "(C) 2019-2020 modeco80 under the MIT License\n";
 	std::cout << "Usage:\n";
 	std::cout << "  " << prog << " <input file>\n";
 }
