@@ -1,6 +1,4 @@
 set(SHPS_SOURCES
-	stb_implementation.cpp
-	
 	Util.h
 	EndianSwap.h
 	

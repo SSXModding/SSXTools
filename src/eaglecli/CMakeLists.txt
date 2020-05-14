@@ -1,4 +1,5 @@
 set(EAGLECLI_SOURCES
+	stb_implementation.cpp
 	main.cpp
 )
 
