@@ -38,9 +38,6 @@ namespace core {
 		// 256 color image
 		Lut256 = 0x1002,
 
-		// 256 color image
-		//Lut256Unknown = TODO,
-
 		// 32bpp, no LUT
 		NonLut32Bpp = 0x1005
 	};
@@ -78,7 +75,8 @@ namespace core {
 		// palette data
 	};
 
-	struct Shps8bppRgba {
+	// 4-byte RGBA color.
+	struct ShpsRgba {
 		// Stored as BGRA
 		union {
 			uint32 total;
@@ -102,7 +100,7 @@ namespace core {
 		std::vector<byte> data;
 
 		// Used if image is LUT256.
-		std::vector<Shps8bppRgba> palette;
+		std::vector<ShpsRgba> palette;
 	};
 
 

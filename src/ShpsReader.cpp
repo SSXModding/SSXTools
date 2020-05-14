@@ -50,16 +50,22 @@ namespace core {
 
 		ShpsTocEntry& e = toc[imageIndex];
 		ShpsImage image;
+		uint32 size{};
 
 		stream.seekg(e.StartOffset, std::istream::beg);
 
 		ReadFromStream<ShpsImageHeader>(stream, image);
 
-		uint32 size;
+		switch(image.format) {
 
-		if(image.format == ShpsImageType::Lut256) {
-			// 1 byte per pixel so size is w*h
+		case ShpsImageType::Lut256:
 			size = image.width * image.height;
+			break;
+
+		default:
+			images.push_back(image);
+			return image;
+			break;
 		}
 
 		image.data.resize(size);
@@ -79,7 +85,7 @@ namespace core {
 
 			// Then read in all of the colors.
 			for(int i = 0; i < 256; ++i) {
-				Shps8bppRgba color;
+				ShpsRgba color;
 				ReadFromStream(stream, color);
 				image.palette[i] = color;
 			}
