@@ -28,28 +28,17 @@ namespace core {
 	/**
 	 * Macro to easily assert a type is POD.
 	 */
-	#define REQUIRES_POD(T) static PodStaticAssert<T> pod__##T;
+	#define EAGLE_REQUIRES_POD(T) static PodStaticAssert<T> pod__##T;
 
 
 #ifdef __GNUC__
-	#define PACK_STRUCT __attribute__((packed))
-	#define RESET_PACKING
+	#define EAGLE_PACK_STRUCT __attribute__((packed))
+	#define EAGLE_RESET_PACKING
 #elif defined(_MSC_VER)
-	#define PACK_STRUCT_INTERNAL(N) __pragma(pack(N))
-	#define PACK_STRUCT PACK_STRUCT_INTERNAL(1)
-	#define RESET_PACKING __pragma(pack(pop))
+	#define EAGLE_PACK_STRUCT_INTERNAL(N) __pragma(pack(N))
+	#define EAGLE_PACK_STRUCT PACK_STRUCT_INTERNAL(1)
+	#define EAGLE_RESET_PACKING __pragma(pack(pop))
 #endif
-
-	/**
-	 * Define a getter function.
-	 */
-	#define EAGLE_GETTER(Type, funName) inline Type funName()
-
-	
-	/**
-	 * Define a setter function.
-	 */
-	#define EAGLE_SETTER(Type, funName) inline void funName(Type& New)
 
 	typedef std::uint8_t byte;
 	typedef std::int8_t sbyte;
@@ -84,7 +73,7 @@ namespace core {
 	 */
 	template<class T>
 	inline bool ReadFromStream(std::istream& stream, T& output) {
-		REQUIRES_POD(T);
+		EAGLE_REQUIRES_POD(T);
 
 		if (!stream)
 			return false;
@@ -108,7 +97,7 @@ namespace core {
 	 */
 	template<typename T>
 	inline bool ReadFromBuffer(char* buf, size_t index, T& out) {
-		REQUIRES_POD(T);
+		EAGLE_REQUIRES_POD(T);
 
 		if(!buf)
 			return false;
@@ -130,8 +119,8 @@ namespace core {
 	template<typename T, typename T2>
 	inline bool SizedCmp(T* a, T2* b) {
 		// We require both operand types to be POD
-		REQUIRES_POD(T);
-		REQUIRES_POD(T2);
+		EAGLE_REQUIRES_POD(T);
+		EAGLE_REQUIRES_POD(T2);
 
 		return !memcmp(a, b, sizeof(T));
 	}
@@ -151,8 +140,8 @@ namespace core {
 	template<typename T, typename T2, std::size_t Offset = 0>
 	inline bool SizedCmpOff(T* a, T2* b) {
 		// We require both operand types to be POD
-		REQUIRES_POD(T);
-		REQUIRES_POD(T2);
+		EAGLE_REQUIRES_POD(T);
+		EAGLE_REQUIRES_POD(T2);
 
 		return !memcmp(a, b, sizeof(T) - Offset);
 	}
@@ -161,7 +150,7 @@ namespace core {
 	 * }@
 	 */
 
-#undef REQUIRES_POD
+#undef EAGLE_REQUIRES_POD
 
 }
 }
