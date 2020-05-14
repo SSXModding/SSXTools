@@ -63,5 +63,8 @@ endif()
 add_subdirectory(src/shpscore)
 
 if(NOT EAGLE_SHPSCORE_ONLY)
+	# Add the eaglewriter library before the UI projects.
+	add_subdirectory(src/eaglewriter)
+
 	add_subdirectory(src/eaglecli)
 endif()

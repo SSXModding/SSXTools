@@ -18,10 +18,8 @@ target_include_directories(shpscore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 # Link additional libraries required for using the 
 # filesystem library with libc++ and libstdc++.
 if(EAGLE_STDLIB STREQUAL "libc++")
-	message(STATUS "Linking c++fs library")
 	target_link_libraries(shpscore c++fs)
 elseif(EAGLE_STDLIB STREQUAL "libstdc++")
-	message(STATUS "Linking stdc++fs library")
 	target_link_libraries(shpscore stdc++fs)
 endif()
 

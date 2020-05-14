@@ -3,21 +3,41 @@
 #include <fstream>
 #include <string>
 #include "ShpsReader.h"
-
-#include "stb_image_write.h"
+#include "writer.h"
 
 using namespace eagle::core;
+using namespace eagle::writer;
 
 void cli_usage(char* prog) {
-	std::cout << "EAGLe: Tool to convert EAGL .SSH texture banks to .PNG files.\n";
+	std::cout << "EAGLe CLI: Command-line tool to convert EAGL .SSH texture banks to .PNG files.\n";
 	std::cout << "(C) 2019-2020 modeco80 under the MIT License\n";
 	std::cout << "Usage:\n";
 	std::cout << "  " << prog << " <input file>\n";
 }
 
-// TODO: this CLI is mostly temporary.
-// I want to be able to make a GUI tool with a selector and stuff for images in a bank
-// and a preview of each texture
+/**
+ * Progress function for the CLI.
+ */
+void cli_progress(std::string& progress, ProgressType type) {
+	std::string type_str;
+
+	switch(type) {
+	case ProgressType::Info:
+		type_str = "[Writer Info]";
+		break;
+		
+	case ProgressType::Error:
+		type_str = "[Writer Error]";
+		break;
+
+	default:
+		type_str = "[Writer Unknown]";
+		break;
+	}
+
+	std::cout << type_str << ' ' << progress << '\n';
+}
+
 int main(int argc, char** argv) {
 	if (argc < 2) {
 		cli_usage(argv[0]);
@@ -33,6 +53,8 @@ int main(int argc, char** argv) {
 	}
 
 	ShpsReader reader(stream, filename);
+
+	SetProgressFunction(cli_progress);
 
 	try {
 		reader.ReadHeader();
@@ -52,66 +74,7 @@ int main(int argc, char** argv) {
 			auto& images = reader.GetImages();
 			ShpsImage& image = images[i];
 			
-			// Constant amount of channels in the output PNG.
-			constexpr int32 CHANNEL_COUNT = 4;
-
-			std::string sshname = filename;
-			sshname.replace(sshname.find_first_of(".SSH"), sshname.find_first_of(".SSH") - sshname.length(), "");
-
-			// TODO: compose a path with std::filesystem instead of this garbage
-			std::string outfilename = sshname + "_" + std::to_string(i) + ".png";
-			std::vector<byte> imageData;
-
-			if(image.data.empty()) {
-				std::cout << "Texture " << i << " is in an unsupported format or has no data, skipping\n";
-				continue;
-			}
-
-			std::cout << "Dumping texture " << i << "...\n";
-
-			std::cout << "Texture " << i << " information:\n";
-			std::cout << "WxH: " << image.width << 'x' << image.height << '\n';
-
-			imageData.resize(image.width * image.height * CHANNEL_COUNT);
-
-			switch(image.format) {
-
-			case ShpsImageType::Lut256: {
-				std::cout << "Image is an 8bpp image\n";
-				byte* ptr = imageData.data();
-				byte* texel = image.data.data();
-
-				// Write each pixel to the image buffer that we save.
-				for(int i = 0; i < image.width * image.height; ++i) {
-						*(ptr++) = image.palette[*texel].color.b;
-						*(ptr++) = image.palette[*texel].color.g;
-						*(ptr++) = image.palette[*texel].color.r;
-
-						byte alpha = image.palette[*texel].color.a;
-
-						// Multiply the stored alpha by 2 
-						// or round it up to 255 if it's 128.
-						// (Further explaination in ShpsStructs.h)
-						// We do this instead of blindly multiplying the alpha value
-						// because it could overflow and break images.
-						if(alpha < 128)
-							alpha *= 2;
-						else if(alpha == 128)
-							alpha = 255;
-
-						*(ptr++) = alpha;
-						texel++;
-				}
-			} break;
-
-			default:
-				break;
-			}
-
-			// Write the PNG.
-			stbi_write_png(outfilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));
-			std::cout << "Output PNG written to " << outfilename << ".\n";
-			imageData.clear();
+			WriteImage(image, filename);
 		}
 
 		std::cout << "Finished conversion, cleaning up...\n";

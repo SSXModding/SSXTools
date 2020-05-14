@@ -49,7 +49,10 @@ namespace core {
 			return {};
 
 		ShpsTocEntry& e = toc[imageIndex];
+
 		ShpsImage image;
+		image.index = imageIndex;
+
 		uint32 size{};
 
 		stream.seekg(e.StartOffset, std::istream::beg);

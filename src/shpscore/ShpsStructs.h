@@ -96,6 +96,10 @@ namespace core {
 				 * The alpha component in SHPS images
 				 * is stored as a single byte with the range
 				 * of 0x00 (0) to 0x80 (128).
+				 *
+				 * This effectively means that there is only half a byte
+				 * of alpha precision (as 1 will become 2, 2 will become 4, so on).
+				 *
 				 */
 				byte a;
 			};
@@ -103,9 +107,26 @@ namespace core {
 	};
 
 	struct ShpsImage : public ShpsImageHeader {
+		/**
+		 * The TOC entry this image is under.
+		 */
+		ShpsTocEntry toc_entry;
+
+		/**
+		 * Image index
+		 */
+		int index;
+
+		/**
+		 * The image data.
+		 *
+		 * Under LUT256, this will contain indexes suitable for the palette array.
+		 */
 		std::vector<byte> data;
 
-		// Used if image is LUT256.
+		/**
+		 * Palette used if this image is palettized.
+		 */
 		std::vector<ShpsRgba> palette;
 	};
 
