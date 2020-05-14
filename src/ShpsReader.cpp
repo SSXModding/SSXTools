@@ -72,9 +72,9 @@ namespace core {
 
 		stream.read((char*)image.data.data(), size);
 
-		if(image.format == ShpsImageType::Lut256
-				/* || image.format == ShpsImageType::Lut256Comp */) {
+		switch(image.format) {
 
+		case ShpsImageType::Lut256: {
 			image.palette.resize(256);
 
 			// Read in the palette.
@@ -89,6 +89,10 @@ namespace core {
 				ReadFromStream(stream, color);
 				image.palette[i] = color;
 			}
+		} break;
+
+		default:
+			break;
 		}
 
 		// Add the image now that we've got its data.

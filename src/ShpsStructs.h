@@ -75,7 +75,9 @@ namespace core {
 		// palette data
 	};
 
-	// 4-byte RGBA color.
+	/**
+	 * 4-byte RGBA color.
+	 */
 	struct ShpsRgba {
 		// Stored as BGRA
 		union {
@@ -88,9 +90,13 @@ namespace core {
 
 				byte r;
 
-				// range of A is 0x00 - 0x80
-				// 0x00 means fully transparent
-				// 0x80 means fully opaque
+				/**
+				 * The alpha component of the color.
+				 *
+				 * The alpha component in SHPS images
+				 * is stored as a single byte with the range
+				 * of 0x00 (0) to 0x80 (128).
+				 */
 				byte a;
 			};
 		} color;

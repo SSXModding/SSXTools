@@ -90,7 +90,10 @@ int main(int argc, char** argv) {
 						byte alpha = image.palette[*texel].color.a;
 
 						// Multiply the stored alpha by 2 
-						// or round it up to 255.
+						// or round it up to 255 if it's 128.
+						// (Further explaination in ShpsStructs.h)
+						// We do this instead of blindly multiplying the alpha value
+						// because it could overflow and break images.
 						if(alpha < 128)
 							alpha *= 2;
 						else if(alpha == 128)

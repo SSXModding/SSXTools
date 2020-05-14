@@ -23,10 +23,10 @@ Simply do `path/to/eagle ssh_path` and EAGLe will do its magic! (TODO this will 
 
 - [x] SSH header loading
 	- [x] SSH TOC loading
-		- [x] 256color images load/coversion
-			- [ ] Get alpha working (this is probably common)
-		- [ ] 16bpp color images load/coversion
-		- [ ] 32bpp images load/coversion
+		- [x] 256color images load/conversion
+			- [x] Get alpha working (this is probably common)
+		- [ ] 16bpp color images load/conversion (Is this even a possible format?)
+		- [ ] 32bpp images load/conversion
 
 
 ## Thanks/Credits
