@@ -60,13 +60,30 @@ namespace core {
 
 		ReadFromStream<ShpsImageHeader>(stream, image);
 
+		// Some images are marked with 0x10(FORMAT)
+		// so we manually set the image format to the paricular one
+		// TODO does this mean image type is a byte?
+		if(image.format == 0x1005)
+			image.format = ShpsImageType::NonLut32Bpp;
+
+		if(image.format == 0x1002)
+			image.format = ShpsImageType::Lut256;
+
 		switch(image.format) {
 
 		case ShpsImageType::Lut256:
 			size = image.width * image.height;
 			break;
 
+		case ShpsImageType::NonLut32Bpp:
+			// While * sizeof(uint32) could be used,
+			// I have chosen to use ShpsRgba's size as it's supposed to be sizeof(uint32)
+			size = (image.width * image.height) * sizeof(ShpsRgba);
+			break;
+
 		default:
+			// Return a empty image.
+			// This is used to skip images that are unsupported.
 			images.push_back(image);
 			return image;
 			break;
@@ -79,6 +96,8 @@ namespace core {
 		switch(image.format) {
 
 		case ShpsImageType::Lut256: {
+			// Resize the palette to the correct size for this 
+			// palettized image format.
 			image.palette.resize(256);
 
 			// Read in the palette.

@@ -39,7 +39,7 @@ namespace core {
 		Lut256 = 0x1002,
 
 		// 32bpp, no LUT
-		NonLut32Bpp = 0x1005
+		NonLut32Bpp = 0x0005
 	};
 
 	struct ShpsImageHeader {

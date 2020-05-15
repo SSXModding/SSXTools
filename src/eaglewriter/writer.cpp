@@ -78,6 +78,36 @@ namespace writer {
 				}
 			} break;
 
+			case ShpsImageType::NonLut32Bpp: {
+				STREAM_PROGRESS_UPDATE(ProgressType::Info, "Image " << image.index << " is an 32bpp image.")
+
+				byte* pngDataPtr = imageData.data();
+				ShpsRgba* texPixelPtr = (ShpsRgba*)image.data.data();
+
+				// Write each pixel to the image buffer that we save.
+				for(int i = 0; i < image.width * image.height; ++i) {
+						
+						*(pngDataPtr++) = (*texPixelPtr).color.b;
+						*(pngDataPtr++) = (*texPixelPtr).color.g;
+						*(pngDataPtr++) = (*texPixelPtr).color.r;
+
+						byte alpha = (*texPixelPtr).color.a;
+
+						// Multiply the stored alpha by 2 
+						// or round it up to 255 if it's 128.
+						// (Further explaination in ShpsStructs.h)
+						// We do this instead of blindly multiplying the alpha value
+						// because it could overflow and break images.
+						if(alpha < 128)
+							alpha *= 2;
+						else if(alpha == 128)
+							alpha = 255;
+
+						*(pngDataPtr++) = alpha;
+						texPixelPtr++;
+				}
+			} break;
+
 			default:
 				break;
 			}
