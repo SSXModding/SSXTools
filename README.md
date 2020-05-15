@@ -39,7 +39,7 @@ target_link_libraries(project shpscore)
 		- [x] 256color images load/conversion
 		- [x] Get alpha working
 		- [ ] 16bpp color images load/conversion (Is this even a possible format?)
-		- [ ] 32bpp images load/conversion
+		- [x] 32bpp images load/conversion
 
 - [ ] Work on a UI for EAGLe
 	- [ ] Offer selection of images to convert along with a preview of a selected image
