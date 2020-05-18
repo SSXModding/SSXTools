@@ -10,9 +10,30 @@ namespace writer {
 
 	ProgressFunction Progress;
 
-	void CheckedProgressUpdate(std::string& str, ProgressType type) {
+	void CheckedProgressUpdate(std::string str, ProgressType type) {
 		if(Progress)
 			Progress(str, type);
+	}
+
+	/**
+	 * Multiply an stored alpha value or clamp it to 255.
+	 *
+	 * \param[in] alpha Alpha value to multiply.
+	 */
+	inline byte MultiplyAlpha(byte alpha) {
+		// Multiply the stored alpha by 2 
+		// or round it directly up to 255 if it's 128.
+		// (Further explaination in ShpsStructs.h)
+		// We do this instead of blindly multiplying the alpha value
+		// because it could overflow and break images.
+		if(alpha < 128)
+			return alpha * 2;
+		else if(alpha == 128)
+			return 255;
+		
+		// I don't know how you'd ever get beyond the following point
+		// but OK
+		return 255;
 	}
 
 	/**
@@ -60,20 +81,8 @@ namespace writer {
 						*(pngDataPtr++) = image.palette[*currentTexPixelPtr].color.b;
 						*(pngDataPtr++) = image.palette[*currentTexPixelPtr].color.g;
 						*(pngDataPtr++) = image.palette[*currentTexPixelPtr].color.r;
-
-						byte alpha = image.palette[*currentTexPixelPtr].color.a;
-
-						// Multiply the stored alpha by 2 
-						// or round it up to 255 if it's 128.
-						// (Further explaination in ShpsStructs.h)
-						// We do this instead of blindly multiplying the alpha value
-						// because it could overflow and break images.
-						if(alpha < 128)
-							alpha *= 2;
-						else if(alpha == 128)
-							alpha = 255;
-
-						*(pngDataPtr++) = alpha;
+						*(pngDataPtr++) = MultiplyAlpha(image.palette[*currentTexPixelPtr].color.a);
+						
 						currentTexPixelPtr++;
 				}
 			} break;
@@ -82,28 +91,22 @@ namespace writer {
 				STREAM_PROGRESS_UPDATE(ProgressType::Info, "Image " << image.index << " is an 32bpp image.")
 
 				byte* pngDataPtr = imageData.data();
+				
+				// We cast the image data (which is just individual bytes) to ShpsRgba* because
+				// non-LUT images directly use ShpsRgba.
+				//
+				// Also saves a bit of typing, as we won't have to manually
+				// advance 4 bytes and cast to ShpsRgba* each and every time.
+				// We can just increment the pointer!
 				ShpsRgba* texPixelPtr = (ShpsRgba*)image.data.data();
 
 				// Write each pixel to the image buffer that we save.
 				for(int i = 0; i < image.width * image.height; ++i) {
-						
 						*(pngDataPtr++) = (*texPixelPtr).color.b;
 						*(pngDataPtr++) = (*texPixelPtr).color.g;
 						*(pngDataPtr++) = (*texPixelPtr).color.r;
-
-						byte alpha = (*texPixelPtr).color.a;
-
-						// Multiply the stored alpha by 2 
-						// or round it up to 255 if it's 128.
-						// (Further explaination in ShpsStructs.h)
-						// We do this instead of blindly multiplying the alpha value
-						// because it could overflow and break images.
-						if(alpha < 128)
-							alpha *= 2;
-						else if(alpha == 128)
-							alpha = 255;
-
-						*(pngDataPtr++) = alpha;
+						*(pngDataPtr++) = MultiplyAlpha((*texPixelPtr).color.a);
+						
 						texPixelPtr++;
 				}
 			} break;
@@ -112,10 +115,12 @@ namespace writer {
 				break;
 			}
 
-			// Write the PNG.
+			// Finally, write the PNG after we've made the data buffers.
 			stbi_write_png(outfilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));
 			STREAM_PROGRESS_UPDATE(ProgressType::Info, "Image " << image.index << " written to \"" << outfilename << "\".")
 			outfilename.clear();
+			
+			// Clear the PNG data buffer after we're done.
 			imageData.clear();
 
 			return true;

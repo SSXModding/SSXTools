@@ -19,7 +19,7 @@ namespace writer {
 	/**
 	 * Progress function signature.
 	 */
-	typedef std::function<void(std::string&, ProgressType)> ProgressFunction;
+	typedef std::function<void(std::string, ProgressType)> ProgressFunction;
 
 	/**
 	 * Set the progress function for the writer.
@@ -31,11 +31,11 @@ namespace writer {
 	/**
 	 * Write the provided SHPSCore image to a PNG file.
 	 *
-	 * Returns false on failure (progress function will output a possible reason).
-	 * or true on sucess.
+	 * Returns false on failure (progress function will output a possible reason),
+	 * or true on successful image write..
 	 *
 	 * \param[in] image Image to write.
-	 * \param[in] filename Input filename.
+	 * \param[in] filename Input filename. WriteImage() will generate a filename automatically from this filename.
 	 */
 	bool WriteImage(core::ShpsImage& image, const std::string& filename);
 	
