@@ -45,16 +45,16 @@ namespace writer {
 		Progress = new_func;
 	}
 
-	bool WriteImage(ShpsImage& image, const std::string& filename) {
+	bool WriteImage(core::ShpsImage& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
 			// Constant amount of channels in the output PNG.
 			constexpr int32 CHANNEL_COUNT = 4;
 
+			auto path = output_path / input_path.filename();
 
-			std::string sshname = filename;
-			sshname.replace(sshname.find_first_of(".SSH"), sshname.find_first_of(".SSH") - sshname.length(), "");
+			std::filesystem::create_directories(path);
 
-			// TODO: compose a path with std::filesystem instead of this garbage
-			std::string outfilename = sshname + "_" + std::to_string(image.index) + ".png";
+			std::string outFilename = (path / std::filesystem::path(std::to_string(image.index)).replace_extension(".PNG")).string();
+
 			std::vector<byte> imageData;
 
 			if(image.data.empty()) {
@@ -67,23 +67,26 @@ namespace writer {
 			STREAM_PROGRESS_UPDATE(ProgressType::Info, "Information on image " << image.index << ':')
 			STREAM_PROGRESS_UPDATE(ProgressType::Info, "Width x Height: " << image.width << 'x' << image.height)
 
-			imageData.resize(image.width * image.height * CHANNEL_COUNT);
+			imageData.resize((image.width * image.height * CHANNEL_COUNT));
 
 			switch(image.format) {
 
 			case ShpsImageType::Lut256: {
 				STREAM_PROGRESS_UPDATE(ProgressType::Info, "Image " << image.index << " is an 8bpp image.")
 				byte* pngDataPtr = imageData.data();
-				byte* currentTexPixelPtr = image.data.data();
+
+				// Current pixel.
+				byte* texPixelPtr = image.data.data();
 
 				// Write each pixel to the image buffer that we save.
+				// We do this by looking in the LUT for each pixel and setting the colors there.
 				for(int i = 0; i < image.width * image.height; ++i) {
-						*(pngDataPtr++) = image.palette[*currentTexPixelPtr].color.b;
-						*(pngDataPtr++) = image.palette[*currentTexPixelPtr].color.g;
-						*(pngDataPtr++) = image.palette[*currentTexPixelPtr].color.r;
-						*(pngDataPtr++) = MultiplyAlpha(image.palette[*currentTexPixelPtr].color.a);
+						*(pngDataPtr++) = image.palette[*texPixelPtr].color.b;
+						*(pngDataPtr++) = image.palette[*texPixelPtr].color.g;
+						*(pngDataPtr++) = image.palette[*texPixelPtr].color.r;
+						*(pngDataPtr++) = MultiplyAlpha(image.palette[*texPixelPtr].color.a);
 						
-						currentTexPixelPtr++;
+						texPixelPtr++;
 				}
 			} break;
 
@@ -115,10 +118,10 @@ namespace writer {
 				break;
 			}
 
+			
 			// Finally, write the PNG after we've made the data buffers.
-			stbi_write_png(outfilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));
-			STREAM_PROGRESS_UPDATE(ProgressType::Info, "Image " << image.index << " written to \"" << outfilename << "\".")
-			outfilename.clear();
+			stbi_write_png(outFilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));
+			STREAM_PROGRESS_UPDATE(ProgressType::Info, "Image " << image.index << " written to \"" << outFilename << "\".")
 			
 			// Clear the PNG data buffer after we're done.
 			imageData.clear();

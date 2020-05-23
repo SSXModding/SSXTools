@@ -2,6 +2,7 @@
 #include "Util.h"
 #include "ShpsStructs.h"
 #include <string>
+#include <filesystem>
 #include <functional>
 
 namespace eagle {
@@ -35,9 +36,10 @@ namespace writer {
 	 * or true on successful image write..
 	 *
 	 * \param[in] image Image to write.
-	 * \param[in] filename Input filename. WriteImage() will generate a filename automatically from this filename.
+	 * \param[in] input_path The input path. Must contain a filename.
+	 * \param[in] output_path The output path.
 	 */
-	bool WriteImage(core::ShpsImage& image, const std::string& filename);
+	bool WriteImage(core::ShpsImage& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path);
 	
 }
 }

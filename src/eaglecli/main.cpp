@@ -2,6 +2,7 @@
 #include <exception>
 #include <fstream>
 #include <string>
+#include <filesystem>
 #include "ShpsReader.h"
 #include "writer.h"
 
@@ -15,11 +16,13 @@ void cli_usage(char* prog) {
 	std::cout << "EAGLe CLI: Command-line tool to convert EAGL .SSH texture banks to .PNG files.\n";
 	std::cout << "(C) 2019-2020 modeco80 under the MIT License\n";
 	std::cout << "Usage:\n";
-	std::cout << "  " << prog << " <input file>\n";
+	std::cout << "  " << prog << " <input file> <output directory>\n";
+	std::cout << "Example:\n";
+	std::cout << "  " << prog << " D:\\ssx\\textures\\aloha_ice_jam_sky.ssh D:\\extracted\\aij\n";
 }
 
 /**
- * Progress function for the CLI.
+ * Writer progress function for the CLI.
  */
 void cli_progress(std::string progress, ProgressType type) {
 	std::string type_str;
@@ -42,20 +45,21 @@ void cli_progress(std::string progress, ProgressType type) {
 }
 
 int main(int argc, char** argv) {
-	if (argc < 2) {
+	if (argc < 3) {
 		cli_usage(argv[0]);
 		return 1;
 	}
-
-	std::string filename(argv[1]);
-	std::ifstream stream(filename, std::ifstream::in | std::ifstream::binary);
+	
+	std::string input_filename = argv[1];
+	std::string output_directory = argv[2];
+	std::ifstream stream(input_filename, std::ifstream::in | std::ifstream::binary);
 
 	if(!stream) {
 		std::cout << "Could not open file for reading\n";
 		return 1;
 	}
 
-	ShpsReader reader(stream, filename);
+	ShpsReader reader(stream, input_filename);
 
 	SetProgressFunction(cli_progress);
 
@@ -83,7 +87,7 @@ int main(int argc, char** argv) {
 		
 		// Write every image in the texture bank to a PNG file.
 		for(uint32 i = 0; i < header.FileTextureCount; ++i)
-			WriteImage(images[i], filename);
+			WriteImage(images[i], std::filesystem::path(input_filename), std::filesystem::path(output_directory));
 
 		std::cout << "Finished conversion, cleaning up...\n";
 
