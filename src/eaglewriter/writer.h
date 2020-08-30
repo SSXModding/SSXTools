@@ -8,7 +8,7 @@
 namespace eagle {
 
 /**
- * Namespace for the PNG writer component of EAGLe.
+ * Namespace for the PNG/buffer writer component of EAGLe.
  */
 namespace writer {
 
@@ -28,6 +28,15 @@ namespace writer {
 	 * \param[in] new_func The new function to use.
 	 */
 	void SetProgressFunction(ProgressFunction new_func);
+
+	/**
+	 * Write the provided SHPSCore image to a buffer in a normal 32bpp RGBA format.
+	 * Returns false on failure.
+	 *
+	 * \param[in] imageBuffer Image buffer to write to.
+	 * \param[in] image SHPSCore image to write
+	 */
+	bool BuildImageBuffer(std::vector<byte>& imageBuffer, core::ShpsImage& image);
 
 	/**
 	 * Write the provided SHPSCore image to a PNG file.

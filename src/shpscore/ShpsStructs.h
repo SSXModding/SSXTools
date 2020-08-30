@@ -5,8 +5,13 @@
 namespace eagle {
 namespace core {
 
-	// File type for SSX (2000).
-	constexpr static char FileType_SSX1[] = "GIMX";
+	// GIMEX VERSIONS
+
+	// Gimex version for SSX (2000).
+	constexpr static char GimexVersion_SSX[] = "GIMX";
+
+	// Gimex version for SSX Tricky (2001).
+	constexpr static char GimexVersion_SSXT[] = "G278";
 
 	// Header of SHPS image
 	struct ShpsFileHeader {
@@ -19,7 +24,8 @@ namespace core {
 		// Texture file count
 		uint32 FileTextureCount;
 
-		char FileType[4];
+		// A code describing the Gimex version
+		char GimexVersion[4];
 	};
 
 	struct ShpsTocEntry {
@@ -34,6 +40,9 @@ namespace core {
 	// These seem to stay the same for certain image types.
 	enum ShpsImageType : uint32 {
 		Unknown,
+	
+		// 4bpp image
+		Lut128 = 0x1001,
 
 		// 256 color image
 		Lut256 = 0x1002,
@@ -43,6 +52,7 @@ namespace core {
 	};
 
 	struct ShpsImageHeader {
+		// This is probably a byte
 		uint16 format;
 
 		uint16 unknown;
@@ -78,32 +88,25 @@ namespace core {
 	/**
 	 * 4-byte RGBA color.
 	 */
-	struct ShpsRgba {
-		// Stored as BGRA
-		union {
-			uint32 total;
+	union ShpsRgba {
+		/**
+		 * total value
+		 */
+		uint32 total;
 
-			struct {
-				byte b;
+		/**
+		 * Struct accessor for accessing individual components
+		 */
+		struct {
+			byte b;
 
-				byte g;
+			byte g;
+			
+			byte r;
 
-				byte r;
+			byte a;
+		};
 
-				/**
-				 * The alpha component of the color.
-				 *
-				 * The alpha component in SHPS images
-				 * is stored as a single byte with the range
-				 * of 0x00 (0) to 0x80 (128).
-				 *
-				 * This effectively means that there is only half a byte
-				 * of alpha precision (as 1 will become 2, 2 will become 4, so on).
-				 *
-				 */
-				byte a;
-			};
-		} color;
 	};
 
 	struct ShpsImage : public ShpsImageHeader {
@@ -120,7 +123,7 @@ namespace core {
 		/**
 		 * The image data.
 		 *
-		 * Under LUT256, this will contain indexes suitable for the palette array.
+		 * Under LUT256 and LUT128, this will contain indexes suitable for the palette array.
 		 */
 		std::vector<byte> data;
 
@@ -129,9 +132,6 @@ namespace core {
 		 */
 		std::vector<ShpsRgba> palette;
 	};
-
-
-#undef unknown
 
 }
 }

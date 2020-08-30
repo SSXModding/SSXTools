@@ -31,6 +31,7 @@ namespace core {
 	void ShpsReader::ReadHeader() {
 		ReadFromStream(stream, header);
 
+		// TODO: Adopt a google-style "No exception" thing
 		if(!CheckValidHeader(header))
 			throw std::invalid_argument("EAGL SSH header invalid");
 	}
@@ -71,6 +72,10 @@ namespace core {
 
 		switch(image.format) {
 
+		case ShpsImageType::Lut128:
+			size = (image.width * image.height) / 2;
+			break;
+
 		case ShpsImageType::Lut256:
 			size = image.width * image.height;
 			break;
@@ -94,6 +99,25 @@ namespace core {
 		stream.read((char*)image.data.data(), size);
 
 		switch(image.format) {
+
+		case ShpsImageType::Lut128: {
+			// Resize the palette to the correct size for this 
+			// palettized image format.
+			image.palette.resize(16);
+
+			// Read in the palette.
+			// First, we read the palette header.
+			// (We should end up there!)
+			ShpsPaletteHeader ph;
+			ReadFromStream(stream, ph);
+
+			// Then read in all of the colors.
+			for (int i = 0; i < 16; ++i) {
+				ShpsRgba color;
+				ReadFromStream(stream, color);
+				image.palette[i] = color;
+			}
+		} break;
 
 		case ShpsImageType::Lut256: {
 			// Resize the palette to the correct size for this 

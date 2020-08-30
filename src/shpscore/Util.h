@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <type_traits>
 #include <cstdint>
 #include <stdint.h>
@@ -11,7 +12,7 @@ namespace core {
 
 
 	/**
-	 * Static assert helper for enforcing POD types while not being ugly.
+	 * Static assert trait helper for enforcing POD types while not being ugly.
 	 * Forward-compatible with C++20's deprecation of is_pod<T>.
 	 *
 	 * \tparam T type to assert is POD.
@@ -26,10 +27,10 @@ namespace core {
 	};
 
 	/**
-	 * Macro to easily assert a type is POD.
+	 * Macro to easily assert a type is POD using PodStaticAssert.
+	 * Multiple EAGLE_REQUIRES_POD values can be stored.
 	 */
 	#define EAGLE_REQUIRES_POD(T) static PodStaticAssert<T> pod__##T;
-
 
 #ifdef __GNUC__
 	#define EAGLE_PACK_STRUCT __attribute__((packed))
@@ -144,6 +145,32 @@ namespace core {
 		EAGLE_REQUIRES_POD(T2);
 
 		return !memcmp(a, b, sizeof(T) - Offset);
+	}	
+
+	/**
+	 * Document please
+	 */
+	template<typename T, typename T2>
+	inline std::vector<T2> ConvertTypes(std::vector<T>& base) {
+		if(base.empty())
+			return { };
+
+		std::vector<T2> values;
+
+		auto dp = base.data();
+		const auto size = base.size() / sizeof(T2);
+
+		if(size == 0) //cannot hold any elements of type T2
+			return {};
+
+
+		for(int i = 0; i < size; ++i) {
+			// read T2 value from T buffer
+			memcpy(values.data()[i], (T2*)base.data()[i], sizeof(T2));
+			values.push_back(v);
+		}
+
+		return values;
 	}
 
 	/**

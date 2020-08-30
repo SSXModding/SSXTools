@@ -1,10 +1,19 @@
 ## EAGLe
 
-EAGLe is a tool that converts EAGL .SSH texture banks (seen on EA Canada Playstation 2 titles) to individual .PNG files.
+EAGLe is a tool for working with EAGL formats, and working with some BIG archives.
 
-I've only tested it with files from SSX (2000) so other games may not work currently.
+Currently, that means converting EAGL .SSH texture banks (seen on EA Canada Playstation 2 titles) to individual .PNG files.
+
+Tested games:
+
+- SSX (2000)
+- SSX Tricky (2001)
+- SSX 3 (2003)
+  - NOTE: 8bpp images are broken.
 
 ## Building EAGLe
+
+You need to clone the repository with the --recursive flag.
 
 ```
 mkdir build
