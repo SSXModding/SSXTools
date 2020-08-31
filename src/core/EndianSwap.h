@@ -17,46 +17,46 @@
 #elif defined(__GNUC__)
 	// Builtin functions with GNU C get turned into (sometimes single-instruction) intrinisics
 	// usually by default if the target supports them. Otherwise,
-	// they become inline functions (which still *have* a speed penalty, 
+	// they become inline functions (which still *have* a speed penalty,
 	// but far less then if it had to make a call into the C runtime)
 	#define BYTESWAP16(x) __builtin_bswap16(x)
 	#define BYTESWAP32(x) __builtin_bswap32(x)
 	#define BYTESWAP64(x) __builtin_bswap64(x)
 #else
-#error Unsupported compiler.
+	#error Unsupported compiler.
 #endif
 
 namespace eagle {
-namespace core {
-	
-	/**
-	 * Swap the endian of a provided value.
-	 *
-	 * \tparam T Type
-	 * \param[in] value value to swap endian of
-	 */
-	template<typename T>
-	inline T EndianSwap(T value) {
-		if constexpr(sizeof(T) == 2) {
-			return BYTESWAP16((std::uint16_t)value);
-		} else if constexpr(sizeof(T) == 4) {
-			return BYTESWAP32((std::uint32_t)value);
-		} else if constexpr(sizeof(T) == 8) {
-			return BYTESWAP64((std::uint64_t)value);
-		} else {
-			// swap sizeof(std::uint16_t) bytes at a time of any structure
-			T temp{};
-			memcpy(&temp, &value, sizeof(T));
+	namespace core {
 
-			for(int32 i = 0; i < sizeof(T); i += sizeof(std::uint16_t))
-				((std::uint16_t*)&temp)[i] = BYTESWAP16(((std::uint16_t*)&temp)[i]);
+		/**
+		 * Swap the endian of a provided value.
+		 *
+		 * \tparam T Type
+		 * \param[in] value value to swap endian of
+		 */
+		template<typename T>
+		inline T EndianSwap(T value) {
+			if constexpr(sizeof(T) == 2) {
+				return BYTESWAP16((std::uint16_t)value);
+			} else if constexpr(sizeof(T) == 4) {
+				return BYTESWAP32((std::uint32_t)value);
+			} else if constexpr(sizeof(T) == 8) {
+				return BYTESWAP64((std::uint64_t)value);
+			} else {
+				// swap sizeof(std::uint16_t) bytes at a time of any structure
+				T temp {};
+				memcpy(&temp, &value, sizeof(T));
 
-			return temp;
+				for(int32 i = 0; i < sizeof(T); i += sizeof(std::uint16_t))
+					((std::uint16_t*)&temp)[i] = BYTESWAP16(((std::uint16_t*)&temp)[i]);
+
+				return temp;
+			}
 		}
-	}
 
-}
-}
+	} // namespace core
+} // namespace eagle
 
 #undef BYTESWAP16
 #undef BYTESWAP32

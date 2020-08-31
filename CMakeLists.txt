@@ -4,13 +4,16 @@ project(EAGLe CXX)
 include(CheckCXXSourceCompiles)
 find_package(Threads)
 
-# EAGLe is made up of two seperate components.
+# EAGLe is made up of two seperate components
 #
-# SHPSCore - The core library that handles SHPS images.
+# Core - The core library that handles formats
+#
 # eagle-cli - The EAGLe CLI interface.
+#
 #
 # This option is provided for other projects to allow importing SHPSCore without also importing the EAGLE UI projects (and causing clutter).
 option(EAGLE_SHPSCORE_ONLY "Turn this option on if you want to use SHPSCore in your projects" OFF)
+
 
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
@@ -60,11 +63,9 @@ if(NOT DEFINED CACHE{EAGLE_STDLIB})
 	message(STATUS "Detected ${EAGLE_STDLIB}")
 endif()
 
-add_subdirectory(src/shpscore)
+add_subdirectory(src/core)
 
 if(NOT EAGLE_SHPSCORE_ONLY)
-	# Add the eaglewriter library before the UI projects.
-	add_subdirectory(src/eaglewriter)
 
 	add_subdirectory(src/eaglecli)
 endif()
