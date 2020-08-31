@@ -36,7 +36,7 @@ namespace writer {
 	 * \param[in] imageBuffer Image buffer to write to.
 	 * \param[in] image SHPSCore image to write
 	 */
-	bool BuildImageBuffer(std::vector<byte>& imageBuffer, core::ShpsImage& image);
+	bool BuildImageBuffer(std::vector<core::byte>& imageBuffer, core::ShpsImage& image);
 
 	/**
 	 * Write the provided SHPSCore image to a PNG file.

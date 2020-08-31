@@ -1,3 +1,5 @@
+# TODO This should be a generic library
+
 set(SHPS_SOURCES
 	Util.h
 	EndianSwap.h

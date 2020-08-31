@@ -108,7 +108,7 @@
   </action>
   <action name="actionBIG4_RefPack">
    <property name="text">
-    <string>BIG4 (RefPack)</string>
+    <string>BIG4/C0FB (RefPack)</string>
    </property>
   </action>
   <action name="aboutEagle">

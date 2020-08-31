@@ -67,8 +67,10 @@ namespace core {
 		if(image.format == 0x1005)
 			image.format = ShpsImageType::NonLut32Bpp;
 
-		if(image.format == 0x1002)
+		if(image.format == 0x1002 || image.format == 0x5002 /* huh? I only see this in AiJ textures */)
 			image.format = ShpsImageType::Lut256;
+
+		std::cout << "Bro damn index " << imageIndex << "has a format of 0x" << std::hex << image.format << std::dec << '\n';
 
 		switch(image.format) {
 

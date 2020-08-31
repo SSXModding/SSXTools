@@ -8,6 +8,10 @@ using namespace eagle::core;
 namespace eagle {
 namespace writer {
 
+	// TODO replace this with a non inlining less garbage fire
+	// or a logging system in core
+	// with multiple channels
+
 	ProgressFunction Progress;
 
 	void CheckedProgressUpdate(std::string str, ProgressType type) {
@@ -15,7 +19,7 @@ namespace writer {
 			Progress(str, type);
 	}
 
-	// TODO replace this with a non inlining garbage fire
+
 	/**
 	 * Macro to use a stringstream to compose progress messages.
 	 */
@@ -46,39 +50,53 @@ namespace writer {
 		return 255;
 	}
 
+	// STL-inspired Wheel Reinvention:TM:
+	template<typename T, class Functor /* TODO use Function<_Ty> with enforced bool(const T&, const T&)*/>
+	inline T MaxBufElement(T* ptr, std::size_t size, Functor comparision) {
+		if(!ptr)
+			return {128, 69, 128}; // Come on..
+		
+		T* max = ptr;
+		T* pit = ptr;
+
+		for(int i = 0; i < size; ++i) {
+			if(comparision(*max, *pit))
+				max = pit;
+			++pit;
+		}
+
+		return *max;
+	}
+
 	/**
 	 * Function called **ONCE** on the ShpsImage to determine if it possibly
-	 * went through `FIXSSH.BAT`, aka `gx -pixela/2,r/2,g/2,b/2 -csm2 %1`. 
+	 * went through the fabled
+	 * `FIXSSH.BAT` (the Winter Jampack 2001 build of SSX Tricky accidentally shipped with this)
+	 * aka `gx -pixela/2,r/2,g/2,b/2 -csm2 %1`.
 	 * If it did, the hack should be enabled.
 	 */
 	bool ShouldEnableSSXHack(core::ShpsImage& image) {
 		// test
 		auto test = [](byte c) {
-			return c != 255 && std::max(c, (byte)128) == 128;
+			return c != 255 && c != 0 /* Seems to fix some other textures */ && std::max(c, (byte)128) == 128;
 		};
 
 		ShpsRgba MaxColor;
 
 		if(image.palette.empty()) {
-			// Detour to a much slower function
+			// Detour to a much slower impl
 			// that gets the max pixel in the entire image.
 			// This will be far slower than if we had a palette,
-			// but it's the only way we can determine it on 32bpp images...
+			// but it's the only way we can determine it on 32bpp images.
 			
 			STREAM_PROGRESS_UPDATE(ProgressType::Info, "Oh no");
 
-			// Convert the raw image data...
-			auto pixels = ConvertTypes<byte, ShpsRgba>(image.data);
+			auto pixels = (ShpsRgba*)image.data.data();
 
-			auto it = std::max_element(pixels.begin(), pixels.end(), [](const ShpsRgba& l, const ShpsRgba& r) {
+			MaxColor = MaxBufElement(pixels, image.width * image.height, [](const ShpsRgba& l, const ShpsRgba& r) {
 				return std::max(l.r, r.r) && std::max(l.g, r.g) 
 						&& std::max(l.b, r.b) && std::max(l.a, r.a);
 			});
-
-			if(it == pixels.end())
-				return false; // What
-
-			MaxColor = *it;
 		} else {
 			// Use a faster method that just gets the max palette.
 
@@ -163,6 +181,8 @@ namespace writer {
 				// We do this by looking in the LUT for each pixel and setting the colors there.
 				for(int i = 0; i < image.width * image.height; ++i) {
 					if(ssxHack) {
+						
+						//STREAM_PROGRESS_UPDATE(ProgressType::Info, "Billbert mays here" << i);
 						*(normalizedDataPtr++) = MultiplyValue(image.palette[*texPixelPtr].b);
 						*(normalizedDataPtr++) = MultiplyValue(image.palette[*texPixelPtr].g);
 						*(normalizedDataPtr++) = MultiplyValue(image.palette[*texPixelPtr].r);
@@ -194,7 +214,6 @@ namespace writer {
 				// Write each pixel to the image buffer that we save.
 				for(int i = 0; i < image.width * image.height; ++i) {
 					if(ssxHack) {
-						STREAM_PROGRESS_UPDATE(ProgressType::Info, "Billbert mays here" << i);
 						*(normalizedDataPtr++) = MultiplyValue((*texPixelPtr).b);
 						*(normalizedDataPtr++) = MultiplyValue((*texPixelPtr).g);
 						*(normalizedDataPtr++) = MultiplyValue((*texPixelPtr).r);
@@ -213,9 +232,19 @@ namespace writer {
 			default:
 				break;
 			}
+			return true;
 	}
 
 	bool WriteImage(core::ShpsImage& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
+
+			// avoid weird images entirely,
+			// helps avoid crashing on Refpack SSHes
+			// (yes, these are a thing, and yes, I despise them)
+			if(image.data.empty()) {
+				STREAM_PROGRESS_UPDATE(ProgressType::Error, "Image " << image.index << " is in a unknown format or is empty.");
+				return false;
+			}
+
 			auto path = output_path / input_path.filename();
 			std::filesystem::create_directories(path);
 			std::string outFilename = (path / std::filesystem::path(std::to_string(image.index)).replace_extension(".PNG")).string();
@@ -223,7 +252,9 @@ namespace writer {
 			std::vector<byte> imageData;
 
 			// build image buffer
-			BuildImageBuffer(imageData, image);
+			if(!BuildImageBuffer(imageData, image)) {
+				STREAM_PROGRESS_UPDATE(ProgressType::Error, "bro damn");
+			}
 			
 			// Finally, write the PNG after we've made the data buffers.
 			stbi_write_png(outFilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));

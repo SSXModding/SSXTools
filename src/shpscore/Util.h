@@ -26,20 +26,28 @@ namespace core {
 #endif
 	};
 
-	/**
-	 * Macro to easily assert a type is POD using PodStaticAssert.
-	 * Multiple EAGLE_REQUIRES_POD values can be stored.
-	 */
-	#define EAGLE_REQUIRES_POD(T) static PodStaticAssert<T> pod__##T;
-
 #ifdef __GNUC__
+	#define EAGLE_UNUSED __attribute__((unused))
 	#define EAGLE_PACK_STRUCT __attribute__((packed))
 	#define EAGLE_RESET_PACKING
 #elif defined(_MSC_VER)
+	// msvc doesn't care about unused values
+	#define EAGLE_UNUSED
 	#define EAGLE_PACK_STRUCT_INTERNAL(N) __pragma(pack(N))
 	#define EAGLE_PACK_STRUCT PACK_STRUCT_INTERNAL(1)
 	#define EAGLE_RESET_PACKING __pragma(pack(pop))
 #endif
+
+	/**
+	 * Macro to easily assert a type is POD using PodStaticAssert.
+	 * Multiple EAGLE_REQUIRES_POD values can be stored.
+	 */
+#if defined(__GNUC__) || defined(__clang__)
+	#define EAGLE_REQUIRES_POD(T) constexpr static __attribute__((unused)) PodStaticAssert<T> pod__##T;
+#else
+	#define EAGLE_REQUIRES_POD(T) constexpr static PodStaticAssert<T> pod__##T;
+#endif
+
 
 	typedef std::uint8_t byte;
 	typedef std::int8_t sbyte;
@@ -53,6 +61,7 @@ namespace core {
 	typedef std::int64_t int64;
 	typedef std::uint64_t uint64;
 
+	// TODO: Import StreamHelper and use it instead
 
 	/**
 	 * \defgroup FunTemp Function templates
@@ -147,31 +156,6 @@ namespace core {
 		return !memcmp(a, b, sizeof(T) - Offset);
 	}	
 
-	/**
-	 * Document please
-	 */
-	template<typename T, typename T2>
-	inline std::vector<T2> ConvertTypes(std::vector<T>& base) {
-		if(base.empty())
-			return { };
-
-		std::vector<T2> values;
-
-		auto dp = base.data();
-		const auto size = base.size() / sizeof(T2);
-
-		if(size == 0) //cannot hold any elements of type T2
-			return {};
-
-
-		for(int i = 0; i < size; ++i) {
-			// read T2 value from T buffer
-			memcpy(values.data()[i], (T2*)base.data()[i], sizeof(T2));
-			values.push_back(v);
-		}
-
-		return values;
-	}
 
 	/**
 	 * }@
