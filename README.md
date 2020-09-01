@@ -1,15 +1,15 @@
 ## EAGLe
 
-EAGLe is a tool for working with EAGL formats, and working with some BIG archives.
+EAGLe is a tool for working with EAGL/Gimex formats, and working with some BIG archives.
 
-Currently, that means converting EAGL .SSH texture banks (seen on EA Canada Playstation 2 titles) to individual .PNG files.
+Currently, that means converting Gimex .SSH shape files (seen on EA Canada Playstation 2 titles) to individual .PNG files.
 
 Tested games:
 
 - SSX (2000)
 - SSX Tricky (2001)
 - SSX 3 (2003)
-  - NOTE: 8bpp images are broken.
+  - NOTE: 8bpp & GST (Gimex GS Texture Compression) shape files are broken.
 
 ## Building EAGLe
 
@@ -26,9 +26,16 @@ On Windows you can also use Visual Studio's CMake tools.
 
 ## Running
 
-Simply do `path/to/eagle ssh_path` and EAGLe will do its magic! (TODO this will change)
+### CLI
+Simply do `path/to/eagle-cli ssh_path dump_path/` and EAGLe will do its magic!
 
-### Using SHPSCore in your own projects
+### GUI
+TODO
+
+## Using Core in your own projects
+
+NOTE that the Core library API will change frequently until
+a stable version...
 
 Include SHPSCore like so...
 ```cmake
@@ -38,7 +45,7 @@ add_subdirectory(path/to/vendor/eagle)
 
 and link with it like...
 ```cmake
-target_link_libraries(project shpscore)
+target_link_libraries(project eagle-core)
 ```
 
 ### Checklist

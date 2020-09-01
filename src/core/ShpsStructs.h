@@ -21,7 +21,7 @@ namespace eagle {
 			struct FileHeader {
 				// File magic (SHPS)
 				char Magic[4];
-				
+
 				/**
 				 * Size of the entire shape file in bytes.
 				 */
@@ -31,7 +31,7 @@ namespace eagle {
 				 * The count of textures in this shape file
 				 */
 				uint32 FileTextureCount;
-				
+
 				/**
 				 * A 4-byte code of the version of Gimex
 				 * used to create the shape file.
@@ -146,7 +146,7 @@ namespace eagle {
 			};
 
 			/**
-			 * EAGLE-specific extension stuff
+			 * EAGLE-specific extension structure to hold image data as well
 			 */
 			struct Image : public shps::ImageHeader {
 				/**

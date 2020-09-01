@@ -12,7 +12,7 @@ using namespace eagle::core;
  * CLI version and usage information.
  */
 void cli_usage(char* prog) {
-	std::cout << "EAGLe CLI: Command-line tool to convert EAGL .SSH texture banks to .PNG files.\n";
+	std::cout << "EAGLe CLI: Command-line tool to convert Gimex .SSH shape files to .PNG files.\n";
 	std::cout << "(C) 2019-2020 modeco80 under the MIT License\n";
 	std::cout << "Usage:\n";
 	std::cout << "  " << prog << " <input file> <output directory>\n";

@@ -9,16 +9,16 @@ namespace eagle {
 
 		bool ShpsReader::CheckValidHeader(const shps::FileHeader& header) {
 			if(SizedCmp(header.Magic, "SHPS")) {
-				auto tellLength = [&]() {
+				auto length = [&]() {
 					auto oldpos = stream.tellg();
 					stream.seekg(0, std::istream::end);
 
 					auto pos = stream.tellg();
 					stream.seekg(oldpos, std::istream::beg);
 					return pos;
-				};
+				}();
 
-				if(tellLength() == header.FileLength) {
+				if(length == header.FileLength) {
 					return true;
 				} else {
 					return false;
@@ -31,7 +31,6 @@ namespace eagle {
 		bool ShpsReader::ReadHeader() {
 			ReadFromStream(stream, header);
 
-			// TODO: Adopt a google-style "No exception" thing
 			if(!CheckValidHeader(header))
 				return false;
 
