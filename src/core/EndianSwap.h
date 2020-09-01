@@ -1,5 +1,5 @@
 #pragma once
-#include "Util.h"
+#include "Core.h"
 
 #ifdef _MSC_VER
 	#include <intrin.h>

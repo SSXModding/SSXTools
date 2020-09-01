@@ -1,7 +1,9 @@
 #include <vector>
 #include <sstream>
 #include "serializers/ShpsWriter.h"
-#include "Util.h"
+#include "Core.h"
+
+// TODO: Switch to a real libpng
 #include "stb_image_write.h"
 
 using namespace eagle::core;
@@ -63,13 +65,13 @@ namespace eagle {
 		 * aka `gx -pixela/2,r/2,g/2,b/2 -csm2 %1`.
 		 * If it did, the hack should be enabled.
 		 */
-		bool ShouldEnableSSXHack(ShpsImage& image) {
+		bool ShouldEnableSSXHack(shps::Image& image) {
 			// test
 			auto test = [](byte c) {
 				return c != 255 && c != 0 /* Seems to fix some other textures */ && std::max(c, (byte)128) == 128;
 			};
 
-			ShpsRgba MaxColor;
+			shps::Bgra8888 MaxColor;
 
 			if(image.palette.empty()) {
 				// Detour to a much slower impl
@@ -77,24 +79,16 @@ namespace eagle {
 				// This will be far slower than if we had a palette,
 				// but it's the only way we can determine it on 32bpp images.
 
-				STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Oh no");
-
-				auto pixels = (ShpsRgba*)image.data.data();
-
-				MaxColor = MaxBufElement(pixels, image.width * image.height, [](const ShpsRgba& l, const ShpsRgba& r) {
+				MaxColor = MaxSpanElement(MakeSpan((shps::Bgra8888*)image.data.data(), image.width * image.height), [](const shps::Bgra8888& l, const shps::Bgra8888& r) {
 					return std::max(l.r, r.r) && std::max(l.g, r.g) && std::max(l.b, r.b) && std::max(l.a, r.a);
 				});
 			} else {
 				// Use a faster method that just gets the max palette.
 
-				auto it = std::max_element(image.palette.begin(), image.palette.end(), [](const ShpsRgba& l, const ShpsRgba& r) {
+				MaxColor = MaxSpanElement(MakeSpan(image.palette.data(), image.palette.size()), [](const shps::Bgra8888& l, const shps::Bgra8888& r) {
 					return std::max(l.r, r.r) && std::max(l.g, r.g) && std::max(l.b, r.b) && std::max(l.a, r.a);
 				});
 
-				if(it == image.palette.end())
-					return false; // What
-
-				MaxColor = *it;
 			}
 
 			// debug stuff:tm:
@@ -107,7 +101,7 @@ namespace eagle {
 		// Constant amount of channels in the output PNG.
 		constexpr int32 CHANNEL_COUNT = 4;
 
-		bool ShpsWriter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::ShpsImage& image) {
+		bool ShpsWriter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image) {
 			if(image.data.empty()) {
 				STREAM_PROGRESS_UPDATE(WriterProgressType::Error, "Image " << image.index << " is in a unknown format or is empty.");
 				return false;
@@ -126,7 +120,7 @@ namespace eagle {
 			imageBuffer.resize((image.width * image.height * CHANNEL_COUNT));
 
 			switch(image.format) {
-				case ShpsImageType::Lut128: {
+				case shps::ShpsImageType::Lut128: {
 					STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Image " << image.index << " is an 4bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
 
@@ -151,7 +145,7 @@ namespace eagle {
 					}
 				} break;
 
-				case ShpsImageType::Lut256: {
+				case shps::ShpsImageType::Lut256: {
 					STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Image " << image.index << " is an 8bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
 
@@ -177,18 +171,18 @@ namespace eagle {
 					}
 				} break;
 
-				case ShpsImageType::NonLut32Bpp: {
+				case shps::ShpsImageType::NonLut32Bpp: {
 					STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Image " << image.index << " is an 32bpp image.");
 
 					byte* normalizedDataPtr = imageBuffer.data();
 
-					// We cast the image data (which is just individual bytes) to ShpsRgba* because
-					// non-LUT images directly use ShpsRgba.
+					// We cast the image data (which is just individual bytes) to Bgra8888* because
+					// non-LUT images directly use Bgra8888.
 					//
 					// Also saves a bit of typing, as we won't have to manually
-					// advance 4 bytes and cast to ShpsRgba* each and every time.
+					// advance 4 bytes and cast to Bgra8888* each and every time.
 					// We can just increment the pointer!
-					ShpsRgba* texPixelPtr = (ShpsRgba*)image.data.data();
+					shps::Bgra8888* texPixelPtr = (shps::Bgra8888*)image.data.data();
 
 					// Write each pixel to the image buffer that we save.
 					for(int i = 0; i < image.width * image.height; ++i) {
@@ -214,7 +208,7 @@ namespace eagle {
 			return true;
 		}
 
-		bool ShpsWriter::WritePNG(core::ShpsImage& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
+		bool ShpsWriter::WritePNG(core::shps::Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
 			// avoid weird images entirely,
 			// helps avoid crashing on Refpack SSHes
 			// (yes, these are a thing, and yes, I despise them)

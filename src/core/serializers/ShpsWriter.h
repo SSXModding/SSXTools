@@ -1,5 +1,5 @@
 #pragma once
-#include "Util.h"
+#include "Core.h"
 #include "ShpsStructs.h"
 #include <string>
 #include <filesystem>
@@ -13,8 +13,10 @@ namespace eagle {
 			Error
 		};
 
+		// TODO rename to clarify
+
 		/**
-		 * The SHPS writer component of EAGLe.
+		 * The SHPS->PNG writer component of EAGLe.
 		 */
 		struct ShpsWriter {
 			/**
@@ -36,7 +38,7 @@ namespace eagle {
 			 * \param[in] imageBuffer Image buffer to write to.
 			 * \param[in] image SHPS image to write
 			 */
-			bool BuildImageBuffer(std::vector<byte>& imageBuffer, ShpsImage& image);
+			bool BuildImageBuffer(std::vector<byte>& imageBuffer, shps::Image& image);
 
 			/**
 			 * Write the provided SHPS image to a PNG file.
@@ -48,7 +50,7 @@ namespace eagle {
 			 * \param[in] input_path The input path. Must contain a filename.
 			 * \param[in] output_path The output path.
 			 */
-			bool WritePNG(ShpsImage& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path);
+			bool WritePNG(shps::Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path);
 		};
 
 	} // namespace core

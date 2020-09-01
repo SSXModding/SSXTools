@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
 
 	reader.ReadTOC();
 
-	ShpsFileHeader& header = reader.GetHeader();
+	shps::FileHeader& header = reader.GetHeader();
 
 	std::cout << "SSH Info:" << '\n';
 

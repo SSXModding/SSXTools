@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <vector>
-#include <exception>
 #include <fstream>
 #include "ShpsStructs.h"
 
@@ -39,26 +38,26 @@ namespace eagle {
 			 *
 			 * \param[in] header File header to check.
 			 */
-			bool CheckValidHeader(const ShpsFileHeader& header);
+			bool CheckValidHeader(const shps::FileHeader& header);
 
 			/**
 			 * Read a image at the provided TOC index.
 			 *
 			 * \param[in] index Index to read.
 			 */
-			ShpsImage ReadImage(int imageIndex);
+			shps::Image ReadImage(int imageIndex);
 
 			/**
 			 * Get the file header.
 			 */
-			inline ShpsFileHeader& GetHeader() {
+			inline shps::FileHeader& GetHeader() {
 				return header;
 			}
 
 			/**
 			 * Get the image TOC.
 			 */
-			inline std::vector<ShpsTocEntry>& GetTOC() {
+			inline std::vector<shps::TocEntry>& GetTOC() {
 				return toc;
 			}
 
@@ -72,7 +71,7 @@ namespace eagle {
 			/**
 			 * Get all images.
 			 */
-			std::vector<ShpsImage>& GetImages() {
+			std::vector<shps::Image>& GetImages() {
 				return images;
 			}
 
@@ -84,13 +83,16 @@ namespace eagle {
 			}
 
 		   private:
+
+			struct ReaderInternal;
+
 			std::istream& stream;
 			std::string filename;
 
 			// Image stuff
-			ShpsFileHeader header {};
-			std::vector<ShpsTocEntry> toc;
-			std::vector<ShpsImage> images;
+			shps::FileHeader header {};
+			std::vector<shps::TocEntry> toc;
+			std::vector<shps::Image> images;
 		};
 
 	} // namespace core
