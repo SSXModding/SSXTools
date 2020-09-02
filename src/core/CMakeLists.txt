@@ -1,9 +1,12 @@
 # TODO This should be a generic library
 
 set(SHPS_SOURCES
-	Util.h
+	Core.h
 	EndianSwap.h
 	
+	RefPack.h
+	RefPack.cpp
+
 	readers/ShpsReader.h
 	readers/ShpsReader.cpp
 	

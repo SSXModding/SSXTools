@@ -197,8 +197,6 @@ namespace eagle {
 		 */
 		template<typename T>
 		inline bool ReadFromBuffer(Span<byte> buf, size_t index, T& out) {
-			EAGLE_REQUIRES_POD(T);
-
 			if(!buf.get() || buf.size() == 0)
 				return false;
 
