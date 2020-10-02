@@ -1,0 +1,6 @@
+[submodule "vendor/mcommon"]
+	path = vendor/mcommon
+	url = https://github.com/modeco80/libmcommon
+[submodule "vendor/bigfile"]
+	path = vendor/bigfile
+	url = https://github.com/modeco80/bigfile

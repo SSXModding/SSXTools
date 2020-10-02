@@ -63,6 +63,12 @@ if(NOT DEFINED CACHE{EAGLE_STDLIB})
 	message(STATUS "Detected ${EAGLE_STDLIB}")
 endif()
 
+set(BIGFILE_ENABLE_EXAMPLES OFF)
+add_subdirectory(vendor/bigfile)
+
+set(MCOMMON_DO_NOT_INSTALL ON)
+add_subdirectory(vendor/mcommon)
+
 add_subdirectory(src/core)
 
 if(NOT EAGLE_SHPSCORE_ONLY)

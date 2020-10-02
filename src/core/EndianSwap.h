@@ -44,7 +44,7 @@ namespace eagle {
 			} else if constexpr(sizeof(T) == 8) {
 				return BYTESWAP64((std::uint64_t)value);
 			} else {
-				// swap sizeof(std::uint16_t) bytes at a time of any structure
+				// swap any structure like it's an array of shorts
 				T temp {};
 				memcpy(&temp, &value, sizeof(T));
 

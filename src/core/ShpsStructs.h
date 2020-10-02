@@ -171,6 +171,12 @@ namespace eagle {
 				 * Palette used if this image is palettized.
 				 */
 				std::vector<shps::Bgra8888> palette;
+
+				// TODO: std::optional<>?
+				/**
+				 * Full image name.
+				 */
+				std::string FullName;
 			};
 
 		} // namespace shps

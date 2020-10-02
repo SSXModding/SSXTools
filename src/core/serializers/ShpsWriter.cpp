@@ -3,6 +3,7 @@
 #include "serializers/ShpsWriter.h"
 #include "Core.h"
 
+
 // TODO: Switch to a real libpng
 #include "stb_image_write.h"
 
@@ -10,31 +11,6 @@ using namespace eagle::core;
 
 namespace eagle {
 	namespace core {
-
-		// TODO replace this with a less garbage logging system in core with multiple channels
-
-		ShpsWriter::ProgressFunction Progress;
-
-		void CheckedProgressUpdate(std::string str, WriterProgressType type) {
-			if(Progress)
-				Progress(str, type);
-		}
-
-		/**
-		 * Macro to use a stringstream to compose progress messages.
-		 */
-#define STREAM_PROGRESS_UPDATE(type, ...)      \
-	do {                                       \
-		std::stringstream ss;                  \
-		ss << __VA_ARGS__;                     \
-		CheckedProgressUpdate(ss.str(), type); \
-		ss.clear();                            \
-	} while(0)
-
-		// static time...
-		void ShpsWriter::SetProgressFunction(ShpsWriter::ProgressFunction new_func) {
-			Progress = new_func;
-		}
 
 		/**
 		 * Multiply an stored byte.
@@ -48,7 +24,7 @@ namespace eagle {
 			// because it could overflow and break images.
 			if(val < 128)
 				return val * 2;
-			else if(val == 128)
+			else if(val == 128) // is another branch needed?
 				return 255;
 
 			// I don't know how you'd ever get beyond the following point
@@ -79,21 +55,19 @@ namespace eagle {
 				// This will be far slower than if we had a palette,
 				// but it's the only way we can determine it on 32bpp images.
 
-				MaxColor = MaxSpanElement(MakeSpan((shps::Bgra8888*)image.data.data(), image.width * image.height), [](const shps::Bgra8888& l, const shps::Bgra8888& r) {
+				MaxColor = MaxSpanElement(mco::MakeSpan((shps::Bgra8888*)image.data.data(), image.width * image.height), [](const shps::Bgra8888& l, const shps::Bgra8888& r) {
 					return std::max(l.r, r.r) && std::max(l.g, r.g) && std::max(l.b, r.b) && std::max(l.a, r.a);
 				});
 			} else {
 				// Use a faster method that just gets the max palette.
 
-				MaxColor = MaxSpanElement(MakeSpan(image.palette.data(), image.palette.size()), [](const shps::Bgra8888& l, const shps::Bgra8888& r) {
+				MaxColor = MaxSpanElement(mco::MakeSpan(image.palette.data(), image.palette.size()), [](const shps::Bgra8888& l, const shps::Bgra8888& r) {
 					return std::max(l.r, r.r) && std::max(l.g, r.g) && std::max(l.b, r.b) && std::max(l.a, r.a);
 				});
 
 			}
 
-			// debug stuff:tm:
-			STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Max Color: R: " << (int)MaxColor.r << " G: " << (int)MaxColor.g << " B: " << (int)MaxColor.b << " A: " << (int)MaxColor.a);
-
+		
 			// seems the best way to detect this hack is to test just the alpha
 			return test(MaxColor.a);
 		}
@@ -103,25 +77,25 @@ namespace eagle {
 
 		bool ShpsWriter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image) {
 			if(image.data.empty()) {
-				STREAM_PROGRESS_UPDATE(WriterProgressType::Error, "Image " << image.index << " is in a unknown format or is empty.");
+				logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
 			}
 
 			bool ssxHack = ShouldEnableSSXHack(image);
 
 			if(ssxHack)
-				STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Enabling FIXSSH.BAT hack cause alpha was <= 128");
+				logger.info("Enabling FIXSSH.BAT hack cause alpha was <= 128");
 
-			STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Writing image " << image.index << "...");
+			logger.info("Writing image ", image.index, "...");
 
-			STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Information on image " << image.index << ':');
-			STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Width x Height: " << image.width << 'x' << image.height);
+			logger.info("Information on image ", image.index, ':');
+			logger.info("Width x Height: ", image.width, 'x', image.height);
 
 			imageBuffer.resize((image.width * image.height * CHANNEL_COUNT));
 
 			switch(image.format) {
 				case shps::ShpsImageType::Lut128: {
-					STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Image " << image.index << " is an 4bpp image.");
+					logger.info("Image ", image.index, " is an 4bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
 
 					// Current pixel.
@@ -133,7 +107,7 @@ namespace eagle {
 						int index = 0;
 
 						for(int b = 0; b < 2; b++) {
-							index = ((*texPixelPtr & (0x0F << (b * 4))) >> (b * 4));
+							index = ((*texPixelPtr & (0x0F, (b * 4))) >> (b * 4));
 						}
 
 						*(normalizedDataPtr++) = image.palette[index].b;
@@ -146,7 +120,7 @@ namespace eagle {
 				} break;
 
 				case shps::ShpsImageType::Lut256: {
-					STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Image " << image.index << " is an 8bpp image.");
+					logger.info("Image ", image.index, " is an 8bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
 
 					// Current pixel.
@@ -172,7 +146,7 @@ namespace eagle {
 				} break;
 
 				case shps::ShpsImageType::NonLut32Bpp: {
-					STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Image " << image.index << " is an 32bpp image.");
+					logger.info("Image ", image.index, " is an 32bpp image.");
 
 					byte* normalizedDataPtr = imageBuffer.data();
 
@@ -213,7 +187,7 @@ namespace eagle {
 			// helps avoid crashing on Refpack SSHes
 			// (yes, these are a thing, and yes, I despise them)
 			if(image.data.empty()) {
-				STREAM_PROGRESS_UPDATE(WriterProgressType::Error, "Image " << image.index << " is in a unknown format or is empty.");
+				logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
 			}
 
@@ -225,12 +199,12 @@ namespace eagle {
 
 			// build image buffer
 			if(!BuildImageBuffer(imageData, image)) {
-				STREAM_PROGRESS_UPDATE(WriterProgressType::Error, "bro damn");
+				logger.error("Could not build image buffer...");
 			}
 
 			// Finally, write the PNG after we've made the data buffers.
 			stbi_write_png(outFilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));
-			STREAM_PROGRESS_UPDATE(WriterProgressType::Info, "Image " << image.index << " written to \"" << outFilename << "\".");
+			logger.info("Image ", image.index, " written to \"", outFilename, "\".");
 
 			// Clear the PNG data buffer after we're done.
 			imageData.clear();

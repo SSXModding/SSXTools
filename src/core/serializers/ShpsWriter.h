@@ -5,31 +5,18 @@
 #include <filesystem>
 #include <functional>
 
+
+#include <modeco/Logger.h>
+
 namespace eagle {
 	namespace core {
 
-		enum WriterProgressType {
-			Info,
-			Error
-		};
-
-		// TODO rename to clarify
+		// TODO rename to clarify that this is a
 
 		/**
 		 * The SHPS->PNG writer component of EAGLe.
 		 */
 		struct ShpsWriter {
-			/**
-			 * Progress function signature.
-			 */
-			typedef std::function<void(std::string, WriterProgressType)> ProgressFunction;
-
-			/**
-			 * Set the progress function for the writer.
-			 *
-			 * \param[in] new_func The new function to use.
-			 */
-			void SetProgressFunction(ProgressFunction new_func);
 
 			/**
 			 * Builds a normal 32bpp RGBA image from a SHPS image.
@@ -51,6 +38,10 @@ namespace eagle {
 			 * \param[in] output_path The output path.
 			 */
 			bool WritePNG(shps::Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path);
+
+		private:
+
+			mco::Logger logger = mco::Logger::CreateLogger("SHPSWriter");
 		};
 
 	} // namespace core

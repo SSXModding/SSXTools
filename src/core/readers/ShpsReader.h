@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include "ShpsStructs.h"
+#include <modeco/BinaryReader.h>
 
 namespace eagle {
 	namespace core {
@@ -17,7 +18,7 @@ namespace eagle {
 		 */
 		struct ShpsReader {
 			ShpsReader(std::istream& stream, std::string& filename)
-				: stream(stream),
+				: reader(stream),
 				  filename(filename) {
 			}
 
@@ -83,10 +84,9 @@ namespace eagle {
 			}
 
 		   private:
+			mco::BinaryReader reader;
 
-			struct ReaderInternal;
-
-			std::istream& stream;
+			//struct ReaderInternal;
 			std::string filename;
 
 			// Image stuff

@@ -10,11 +10,11 @@ namespace eagle {
 		bool ShpsReader::CheckValidHeader(const shps::FileHeader& header) {
 			if(SizedCmp(header.Magic, "SHPS")) {
 				auto length = [&]() {
-					auto oldpos = stream.tellg();
-					stream.seekg(0, std::istream::end);
+					auto oldpos = reader.raw().tellg();
+					 reader.raw().seekg(0, std::istream::end);
 
-					auto pos = stream.tellg();
-					stream.seekg(oldpos, std::istream::beg);
+					auto pos =  reader.raw().tellg();
+					reader.raw().seekg(oldpos, std::istream::beg);
 					return pos;
 				}();
 
@@ -29,7 +29,7 @@ namespace eagle {
 		}
 
 		bool ShpsReader::ReadHeader() {
-			ReadFromStream(stream, header);
+			reader.ReadSingleType(header);
 
 			if(!CheckValidHeader(header))
 				return false;
@@ -40,7 +40,7 @@ namespace eagle {
 		void ShpsReader::ReadTOC() {
 			for(uint32 i = 0; i < header.FileTextureCount; ++i) {
 				shps::TocEntry entry;
-				ReadFromStream(stream, entry);
+				reader.ReadSingleType(entry);
 
 				toc.push_back(entry);
 			}
@@ -58,9 +58,9 @@ namespace eagle {
 
 			uint32 size {};
 
-			stream.seekg(tocEntry.StartOffset, std::istream::beg);
+			reader.raw().seekg(tocEntry.StartOffset, std::istream::beg);
 
-			ReadFromStream<shps::ImageHeader>(stream, image);
+			reader.ReadSingleType<shps::ImageHeader>(image);
 
 			// Some images are marked with 0x10(FORMAT)
 			// so we manually set the image format to the paricular one
@@ -96,7 +96,10 @@ namespace eagle {
 
 			image.data.resize(size);
 
-			stream.read((char*)image.data.data(), size);
+			reader.ReadRawBuffer((char*)image.data.data(), size);
+
+			// TODO: Now that we have bigfile we can use its RefPack decompression code to deal with the agonizing pain that is
+			// refpack shape textures.
 
 			switch(image.format) {
 				case shps::ShpsImageType::Lut128: {
@@ -108,14 +111,11 @@ namespace eagle {
 					// First, we read the palette header.
 					// (We should end up there!)
 					shps::PaletteHeader ph;
-					ReadFromStream(stream, ph);
+					reader.ReadSingleType(ph);
 
 					// Then read in all of the colors.
-					for(int i = 0; i < 16; ++i) {
-						shps::Bgra8888 color;
-						ReadFromStream(stream, color);
-						image.palette[i] = color;
-					}
+					for(int i = 0; i < 16; ++i)
+						reader.ReadSingleType(image.palette[i]);
 				} break;
 
 				case shps::ShpsImageType::Lut256: {
@@ -127,14 +127,11 @@ namespace eagle {
 					// First, we read the palette header.
 					// (We should end up there!)
 					shps::PaletteHeader ph;
-					ReadFromStream(stream, ph);
+					reader.ReadSingleType(ph);
 
 					// Then read in all of the colors.
-					for(int i = 0; i < 256; ++i) {
-						shps::Bgra8888 color;
-						ReadFromStream(stream, color);
-						image.palette[i] = color;
-					}
+					for(int i = 0; i < 256; ++i)
+						reader.ReadSingleType(image.palette[i]);
 				} break;
 
 				default:
