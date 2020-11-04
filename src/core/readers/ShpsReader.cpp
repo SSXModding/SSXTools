@@ -10,6 +10,28 @@
 namespace eagle {
 	namespace core {
 
+		/**
+		 * template function to read palette
+		 * \tparam N amount of colors to read
+		 */
+		template<int N>
+		constexpr void ReadPalette(std::vector<shps::Bgra8888>& palette, mco::BinaryReader& reader) {
+			palette.resize(N);
+
+			for(int i = 0; i < N; ++i)
+				reader.ReadSingleType<shps::Bgra8888>(palette[i]);
+		}
+
+		/**
+		 * utility to read a 24-bit LE value
+		 */
+		constexpr uint32 DoRead24LE(mco::BinaryReader& reader) {
+			byte buf[3] {};
+			reader.ReadSingleType(buf);
+
+			return ((buf[2] << 16) | (buf[1] << 8) | buf[0]);
+		}
+
 		bool ShpsReader::CheckValidHeader(const shps::FileHeader& header) {
 			if(SizedCmp(header.Magic, "SHPS")) {
 				auto length = [&]() {
@@ -49,34 +71,14 @@ namespace eagle {
 			}
 		}
 
-		/**
-		 * template function to read palette
-		 * \tparam N amount of colors to read
-		 */
-		template<int N>
-		constexpr void ReadPalette(std::vector<shps::Bgra8888>& palette, mco::BinaryReader& reader) {
-			palette.resize(N);
-
-			for(int i = 0; i < N; ++i)
-				reader.ReadSingleType<shps::Bgra8888>(palette[i]);
-		}
-
-		/**
-		 * utility to read a 24-bit LE value
-		 */
-		constexpr uint32 DoRead24LE(mco::BinaryReader& reader) {
-			byte buf[3] {};
-			reader.ReadSingleType(buf);
-
-			return ((buf[2] << 16) | (buf[1] << 8) | buf[0]);
-		}
-
 		shps::Image ShpsReader::ReadImage(int imageIndex) {
 			if(imageIndex > toc.size())
 				return {};
 
 			shps::TocEntry& tocEntry = toc[imageIndex];
 
+			// whether or not we should bother reading the 
+			// CLUT
 			bool readclut = false;
 
 			shps::Image image;
@@ -93,8 +95,8 @@ namespace eagle {
 			// This is a hack and I really should be masking out 0x80,
 			// but this should work for 95% of cases for now
 
-#define FIX_SHAPE_FORMAT(n, type) \
-	if(image.format == (shps::ShpsImageType)0x8##n)    \
+#define FIX_SHAPE_FORMAT(n, type)                   \
+	if(image.format == (shps::ShpsImageType)0x8##n) \
 		image.format = shps::ShpsImageType::type;
 
 			FIX_SHAPE_FORMAT(2, Lut256);
@@ -106,23 +108,33 @@ namespace eagle {
 
 			reader.ReadSingleType<shps::ImageHeader>(image);
 
+			// Non-CLUT shapes set the clut offset to 0.
+			// In this case, we don't need to bother reading in the CLUT.
+			// This also declares a previous "hack" a non-hack and actually
+			// probably the intended way for non-palletized shapes to be read.
 			if(image.clut_offset != 0) {
-				// Signal the need to read a CLUT after the image data
 				readclut = true;
 				size = image.clut_offset - sizeof(shps::ImageHeader);
 			} else {
 				size = (image.width * image.height) * sizeof(shps::Bgra8888);
 			}
 
+			// Resize the data buffer and read the entire image's data into it.
 			image.data.resize(size);
 			reader.ReadRawBuffer((char*)image.data.data(), size);
-			
-			// Decompress the RefPack data out into raw image data.
+
+			// Decompress the RefPack data out into raw image data,
+			// if this is a refpack shape image.
 			if(image.data[0] == 0x10 && image.data[1] == 0xFB) {
 				auto decompressed = bigfile::refpack::Decompress(bigfile::MakeSpan(image.data.data(), size));
+				// Clear the previous data buffer to conserve memory,
+				// as it isn't needed after this.
 				image.data.clear();
 				image.data.resize(decompressed.size());
+				// Copy data back into the image data as decompressed data
 				memcpy(&image.data[0], &decompressed[0], decompressed.size() * sizeof(byte));
+
+				decompressed.clear();
 			}
 
 			// Read in the CLUT if we need to.
@@ -131,7 +143,7 @@ namespace eagle {
 				shps::PaletteHeader ph;
 				reader.ReadSingleType(ph);
 
-				// ALL palettized shapes have a CLUT header with this magic value being the first byte.
+				// ALL palettized shapes have a CLUT header with this magic value (ascii '!') being the first byte.
 				// So, if this isn't pressent, then we just return a empty shape and presume it's invalid.
 				if(ph.unknown[0] != 0x21) {
 					images.push_back({});

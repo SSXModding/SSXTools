@@ -25,7 +25,7 @@ namespace eagle {
 
 		using mco::int16;
 		using mco::uint16;
-		
+
 		using mco::int32;
 		using mco::uint32;
 
@@ -51,7 +51,6 @@ namespace eagle {
 		inline bool SizedCmp(T* a, T2* b) {
 			return !memcmp(a, b, sizeof(T));
 		}
-
 
 		/**
 		 * std::max_element for spans
@@ -103,9 +102,15 @@ namespace eagle {
 		}
 
 		/**
+		 * Make a fourcc value at compile time
+		 */
+		constexpr uint32 make_fourcc(const char p[5]) {
+			return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+		}
+
+		/**
 		 * }@
 		 */
-
 
 	} // namespace core
 } // namespace eagle

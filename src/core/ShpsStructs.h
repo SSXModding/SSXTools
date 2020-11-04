@@ -10,10 +10,10 @@ namespace eagle {
 			// We'll need these for some Gimex version specific stuff
 
 			// Gimex version for SSX (2000). Doesn't seem to put a real version here
-			constexpr static char GimexVersion_SSX[] = "GIMX";
+			constexpr static uint32 GimexVersion_SSX = make_fourcc("GIMX");
 
 			// Gimex version for SSX Tricky (2001).
-			constexpr static char GimexVersion_SSXT[] = "G278";
+			constexpr static uint32 GimexVersion_SSXT = make_fourcc("G278");
 
 			/*
 			 * Header of Gimex shape files. 
@@ -36,7 +36,7 @@ namespace eagle {
 				 * A 4-byte code of the version of Gimex
 				 * used to create the shape file.
 				 */
-				char GimexVersion[4];
+				uint32 creator;
 
 				// TODO: use the array hack that gimex seems to already use?
 			};
