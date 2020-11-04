@@ -87,14 +87,14 @@ namespace eagle {
 
 			reader.raw().seekg(tocEntry.StartOffset, std::istream::beg);
 
-			reader.ReadSingleType<byte>(image.format);
+			reader.ReadSingleType<shps::ShpsImageType>(image.format);
 
 			// fix the format of refpack shapes
 			// This is a hack and I really should be masking out 0x80,
 			// but this should work for 95% of cases for now
 
 #define FIX_SHAPE_FORMAT(n, type) \
-	if(image.format == 0x8##n)    \
+	if(image.format == (shps::ShpsImageType)0x8##n)    \
 		image.format = shps::ShpsImageType::type;
 
 			FIX_SHAPE_FORMAT(2, Lut256);

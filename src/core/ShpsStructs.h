@@ -60,13 +60,10 @@ namespace eagle {
 
 			// This is taken from the first byte in ShpsImageHeader.
 			// These seem to stay the same for certain image types.
-			enum ShpsImageType : uint32 {
+			enum class ShpsImageType : byte {
 				Unknown,
 
 				// 4bpp image
-				// These may be the stupid compression thing
-				// I saw in GX...
-				// Nope, these are proper 4bpp textures
 				Lut128 = 0x1,
 
 				// 256 color image
@@ -110,7 +107,7 @@ namespace eagle {
 
 				uint32 unknown4;
 
-				// palette data
+				// palette data as a array of bgra8888
 			};
 
 			/**
@@ -144,8 +141,7 @@ namespace eagle {
 				// we don't read the whole file but we might have to soon
 				// when we do that we can just do casting upon it
 
-				// This is probably a byte
-				byte format; // this is a bitfield in EAC headers, this absoultely does not need to be one though
+				ShpsImageType format; // this is a bitfield in EAC headers, this absoultely does not need to be one though
 
 				// 24-bit offset to CLUT relative to the start of the shape header
 				uint32 clut_offset;
