@@ -67,7 +67,10 @@ namespace eagle {
 
 			}
 
-		
+			// bodge
+#if 0
+			return false;
+#endif
 			// seems the best way to detect this hack is to test just the alpha
 			return test(MaxColor.a);
 		}
@@ -138,7 +141,7 @@ namespace eagle {
 							*(normalizedDataPtr++) = image.palette[*texPixelPtr].b;
 							*(normalizedDataPtr++) = image.palette[*texPixelPtr].g;
 							*(normalizedDataPtr++) = image.palette[*texPixelPtr].r;
-							*(normalizedDataPtr++) = image.palette[*texPixelPtr].a;
+							*(normalizedDataPtr++) = MultiplyValue(image.palette[*texPixelPtr].a);
 						}
 
 						texPixelPtr++;
@@ -169,7 +172,7 @@ namespace eagle {
 							*(normalizedDataPtr++) = (*texPixelPtr).b;
 							*(normalizedDataPtr++) = (*texPixelPtr).g;
 							*(normalizedDataPtr++) = (*texPixelPtr).r;
-							*(normalizedDataPtr++) = (*texPixelPtr).a;
+							*(normalizedDataPtr++) = MultiplyValue((*texPixelPtr).a);
 						}
 
 						texPixelPtr++;

@@ -4,6 +4,9 @@
 #include "EndianSwap.h"
 #include "ShpsReader.h"
 
+// needed for refpack shape decompression
+#include <bigfile/refpack.h>
+
 namespace eagle {
 	namespace core {
 
@@ -11,9 +14,9 @@ namespace eagle {
 			if(SizedCmp(header.Magic, "SHPS")) {
 				auto length = [&]() {
 					auto oldpos = reader.raw().tellg();
-					 reader.raw().seekg(0, std::istream::end);
+					reader.raw().seekg(0, std::istream::end);
 
-					auto pos =  reader.raw().tellg();
+					auto pos = reader.raw().tellg();
 					reader.raw().seekg(oldpos, std::istream::beg);
 					return pos;
 				}();
@@ -46,100 +49,111 @@ namespace eagle {
 			}
 		}
 
+		/**
+		 * template function to read palette
+		 * \tparam N amount of colors to read
+		 */
+		template<int N>
+		constexpr void ReadPalette(std::vector<shps::Bgra8888>& palette, mco::BinaryReader& reader) {
+			palette.resize(N);
+
+			for(int i = 0; i < N; ++i)
+				reader.ReadSingleType<shps::Bgra8888>(palette[i]);
+		}
+
+		/**
+		 * utility to read a 24-bit LE value
+		 */
+		constexpr uint32 DoRead24LE(mco::BinaryReader& reader) {
+			byte buf[3] {};
+			reader.ReadSingleType(buf);
+
+			return ((buf[2] << 16) | (buf[1] << 8) | buf[0]);
+		}
+
 		shps::Image ShpsReader::ReadImage(int imageIndex) {
 			if(imageIndex > toc.size())
 				return {};
 
 			shps::TocEntry& tocEntry = toc[imageIndex];
 
+			bool readclut = false;
+
 			shps::Image image;
 			image.index = imageIndex;
 			image.toc_entry = tocEntry;
 
-			uint32 size {};
+			uint64 size {};
 
 			reader.raw().seekg(tocEntry.StartOffset, std::istream::beg);
 
+			reader.ReadSingleType<byte>(image.format);
+
+			// fix the format of refpack shapes
+			// This is a hack and I really should be masking out 0x80,
+			// but this should work for 95% of cases for now
+
+#define FIX_SHAPE_FORMAT(n, type) \
+	if(image.format == 0x8##n)    \
+		image.format = shps::ShpsImageType::type;
+
+			FIX_SHAPE_FORMAT(2, Lut256);
+			FIX_SHAPE_FORMAT(5, NonLut32Bpp);
+
+#undef FIX_SHAPE_FORMAT
+
+			image.clut_offset = DoRead24LE(reader);
+
 			reader.ReadSingleType<shps::ImageHeader>(image);
 
-			// Some images are marked with 0x10(FORMAT)
-			// so we manually set the image format to the paricular one
-			// TODO does this mean image type is a byte?
-			if(image.format == 0x1005)
-				image.format = shps::ShpsImageType::NonLut32Bpp;
-
-			if(image.format == 0x1002 || image.format == 0x5002 /* huh? I only see this in AiJ textures */)
-				image.format = shps::ShpsImageType::Lut256;
-
-			switch(image.format) {
-				case shps::ShpsImageType::Lut128:
-					size = (image.width * image.height) / 2;
-					break;
-
-				case shps::ShpsImageType::Lut256:
-					size = image.width * image.height;
-					break;
-
-				case shps::ShpsImageType::NonLut32Bpp:
-					// While * sizeof(uint32) could be used,
-					// I have chosen to use Bgra8888's size as it's supposed to be sizeof(uint32)
-					size = (image.width * image.height) * sizeof(shps::Bgra8888);
-					break;
-
-				default:
-					// Return a empty image.
-					// This is used to skip images that are unsupported.
-					images.push_back(image);
-					return image;
-					break;
+			if(image.clut_offset != 0) {
+				// Signal the need to read a CLUT after the image data
+				readclut = true;
+				size = image.clut_offset - sizeof(shps::ImageHeader);
+			} else {
+				size = (image.width * image.height) * sizeof(shps::Bgra8888);
 			}
 
 			image.data.resize(size);
-
 			reader.ReadRawBuffer((char*)image.data.data(), size);
+			
+			// Decompress the RefPack data out into raw image data.
+			if(image.data[0] == 0x10 && image.data[1] == 0xFB) {
+				auto decompressed = bigfile::refpack::Decompress(bigfile::MakeSpan(image.data.data(), size));
+				image.data.clear();
+				image.data.resize(decompressed.size());
+				memcpy(&image.data[0], &decompressed[0], decompressed.size() * sizeof(byte));
+			}
 
-			// TODO: Now that we have bigfile we can use its RefPack decompression code to deal with the agonizing pain that is
-			// refpack shape textures.
+			// Read in the CLUT if we need to.
+			if(readclut) {
+				reader.raw().seekg(tocEntry.StartOffset + image.clut_offset, std::istream::beg);
+				shps::PaletteHeader ph;
+				reader.ReadSingleType(ph);
 
-			switch(image.format) {
-				case shps::ShpsImageType::Lut128: {
-					// Resize the palette to the correct size for this
-					// palettized image format.
-					image.palette.resize(16);
+				// ALL palettized shapes have a CLUT header with this magic value being the first byte.
+				// So, if this isn't pressent, then we just return a empty shape and presume it's invalid.
+				if(ph.unknown[0] != 0x21) {
+					images.push_back({});
+					return {};
+				}
 
-					// Read in the palette.
-					// First, we read the palette header.
-					// (We should end up there!)
-					shps::PaletteHeader ph;
-					reader.ReadSingleType(ph);
+				switch(image.format) {
+					case shps::ShpsImageType::Lut128:
+						ReadPalette<16>(image.palette, reader);
+						break;
 
-					// Then read in all of the colors.
-					for(int i = 0; i < 16; ++i)
-						reader.ReadSingleType(image.palette[i]);
-				} break;
+					case shps::ShpsImageType::Lut256:
+						ReadPalette<256>(image.palette, reader);
+						break;
 
-				case shps::ShpsImageType::Lut256: {
-					// Resize the palette to the correct size for this
-					// palettized image format.
-					image.palette.resize(256);
-
-					// Read in the palette.
-					// First, we read the palette header.
-					// (We should end up there!)
-					shps::PaletteHeader ph;
-					reader.ReadSingleType(ph);
-
-					// Then read in all of the colors.
-					for(int i = 0; i < 256; ++i)
-						reader.ReadSingleType(image.palette[i]);
-				} break;
-
-				default:
-					break;
+					default:
+						break;
+				}
 			}
 
 			// Add the image now that we've got its data.
-			images.push_back(image);
+			images.emplace_back(image);
 			return image;
 		}
 

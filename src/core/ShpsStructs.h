@@ -37,6 +37,8 @@ namespace eagle {
 				 * used to create the shape file.
 				 */
 				char GimexVersion[4];
+
+				// TODO: use the array hack that gimex seems to already use?
 			};
 
 			/**
@@ -47,7 +49,7 @@ namespace eagle {
 				 * Name of the image.
 				 */
 				// NOTE: SSX 3 has a Gimex extension that sometimes puts the full
-				// name of the texture after it.
+				// name of the texture after the clut.
 				char Name[4];
 
 				/**
@@ -56,7 +58,7 @@ namespace eagle {
 				uint32 StartOffset;
 			};
 
-			// This is taken from the first uint16 in ShpsImageHeader.
+			// This is taken from the first byte in ShpsImageHeader.
 			// These seem to stay the same for certain image types.
 			enum ShpsImageType : uint32 {
 				Unknown,
@@ -64,36 +66,25 @@ namespace eagle {
 				// 4bpp image
 				// These may be the stupid compression thing
 				// I saw in GX...
-				Lut128 = 0x1001,
+				// Nope, these are proper 4bpp textures
+				Lut128 = 0x1,
 
 				// 256 color image
-				Lut256 = 0x1002,
+				Lut256 = 0x02,
 
-				// 32bpp, no LUT
-				NonLut32Bpp = 0x0005
-			};
-
-			/**
-			 * TODO
-			 */
-			enum ShapeCLUTFormat : byte {
-
-				RGBA8888 = 0x21
+				// 32bpp BGRA, no LUT
+				NonLut32Bpp = 0x05
 			};
 
 			/**
 			 * Shape file per-image header
 			 */
 			struct ImageHeader {
-				// This is probably a byte
-				uint16 format;
-
-				uint16 unknown;
-
 				uint16 width;
 
 				uint16 height;
 
+				// TODO: these are bit fields too(TM)
 				uint32 unknown2;
 
 				uint32 unknown3;
@@ -149,6 +140,16 @@ namespace eagle {
 			 * EAGLE-specific extension structure to hold image data as well
 			 */
 			struct Image : public shps::ImageHeader {
+				// MOVE THESE BACK INTO THE HEADER!!!
+				// we don't read the whole file but we might have to soon
+				// when we do that we can just do casting upon it
+
+				// This is probably a byte
+				byte format; // this is a bitfield in EAC headers, this absoultely does not need to be one though
+
+				// 24-bit offset to CLUT relative to the start of the shape header
+				uint32 clut_offset;
+
 				/**
 				 * The TOC entry this image is under.
 				 */
