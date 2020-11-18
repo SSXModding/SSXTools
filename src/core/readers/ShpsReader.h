@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include "ShpsStructs.h"
+#include "GimexCodec.h"
 #include <modeco/BinaryReader.h>
 
 namespace eagle {
@@ -86,7 +87,6 @@ namespace eagle {
 		   private:
 			mco::BinaryReader reader;
 
-			//struct ReaderInternal;
 			std::string filename;
 
 			// Image stuff

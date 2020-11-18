@@ -1,25 +1,35 @@
 ## EAGLe
 
-EAGLe is a tool for working with EAGL/Gimex formats, and working with some BIG archives.
+EAGLe is a tool for working with EAGL/Gimex formats, and (potentionally...) working with some BIG archives.
+
 
 Currently, that means converting Gimex .SSH shape files (seen on EA Canada Playstation 2 titles) to individual .PNG files.
+
+
+It's main goals are to work well while being very small and fast at the same time.
 
 Tested games:
 
 - SSX (2000)
 - SSX Tricky (2001)
 - SSX 3 (2003)
-  - NOTE: 8bpp & GST (Gimex GS Texture Compression) shape files are broken.
+
+## Credits
+
+- eldrinn for making SSX3Converter
 
 ## Building EAGLe
 
 You need to clone the repository with the --recursive flag.
 
+For building the EAGLe UI, you need to install Qt 5.
+
 ```
 mkdir build
 cd build
-cmake .. <your options here>
+cmake .. <your options here, install to a prefix on Windows>
 make -j3
+(for UI on Windows/selfcontained build) make install
 ```
 
 On Windows you can also use Visual Studio's CMake tools.
@@ -30,7 +40,7 @@ On Windows you can also use Visual Studio's CMake tools.
 Simply do `path/to/eagle-cli ssh_path dump_path/` and EAGLe will do its magic!
 
 ### GUI
-TODO
+just run the exe lol
 
 ## Using Core in your own projects
 
@@ -56,11 +66,3 @@ target_link_libraries(project eagle-core)
 		- [x] Get alpha working
 		- [ ] 16bpp color images load/conversion (Is this even a possible format?)
 		- [x] 32bpp images load/conversion
-
-- [ ] Work on a UI for EAGLe
-	- [ ] Offer selection of images to convert along with a preview of a selected image
-
-
-## Thanks/Credits
-
-Thanks to [Sean Barrett](https://github.com/nothings/stb) for his wonderful stb_image_write library.

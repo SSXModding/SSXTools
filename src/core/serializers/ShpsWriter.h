@@ -7,11 +7,16 @@
 
 
 #include <modeco/Logger.h>
+#ifdef INQT
+#undef error
+#undef verbose
+#endif
 
 namespace eagle {
 	namespace core {
 
-		// TODO rename to clarify that this is a
+		// TODO rename to clarify that this is a png/raw writer
+		// and not a shape file writer
 
 		/**
 		 * The SHPS->PNG writer component of EAGLe.

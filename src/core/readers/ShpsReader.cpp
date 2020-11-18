@@ -4,6 +4,8 @@
 #include "EndianSwap.h"
 #include "ShpsReader.h"
 
+#include "GimexInterleavedCodec.h"
+
 // needed for refpack shape decompression
 #include <bigfile/refpack.h>
 
@@ -25,7 +27,7 @@ namespace eagle {
 		/**
 		 * utility to read a 24-bit LE value
 		 */
-		constexpr uint32 DoRead24LE(mco::BinaryReader& reader) {
+		constexpr uint32 Read24LE(mco::BinaryReader& reader) {
 			byte buf[3] {};
 			reader.ReadSingleType(buf);
 
@@ -77,11 +79,12 @@ namespace eagle {
 
 			shps::TocEntry& tocEntry = toc[imageIndex];
 
-			// whether or not we should bother reading the 
+			// whether or not we should bother reading the
 			// CLUT
 			bool readclut = false;
-
 			shps::Image image;
+			std::shared_ptr<BaseGimexCodec> codec;
+
 			image.index = imageIndex;
 			image.toc_entry = tocEntry;
 
@@ -104,8 +107,7 @@ namespace eagle {
 
 #undef FIX_SHAPE_FORMAT
 
-			image.clut_offset = DoRead24LE(reader);
-
+			image.clut_offset = Read24LE(reader);
 			reader.ReadSingleType<shps::ImageHeader>(image);
 
 			// Non-CLUT shapes set the clut offset to 0.
@@ -118,6 +120,17 @@ namespace eagle {
 			} else {
 				size = (image.width * image.height) * sizeof(shps::Bgra8888);
 			}
+
+			// Make the codec beforehand if we need to
+			switch(image.unknown2) { // TODO: all G357 shapes that are 8bpp seem to require this, so maybe check for THAT?
+			case shps::EncodingType::Interleaved:
+				codec = std::make_shared<InterleavedCodec>();
+				break;
+
+			default:
+				break;
+			}
+
 
 			// Resize the data buffer and read the entire image's data into it.
 			image.data.resize(size);
@@ -137,17 +150,24 @@ namespace eagle {
 				decompressed.clear();
 			}
 
+			// If we need to decode the image data using a gimex codec,
+			// then do so before reading in the CLUT
+			if(codec)
+				image.data = codec->Decode(image);
+
 			// Read in the CLUT if we need to.
 			if(readclut) {
 				reader.raw().seekg(tocEntry.StartOffset + image.clut_offset, std::istream::beg);
 				shps::PaletteHeader ph;
 				reader.ReadSingleType(ph);
 
+
 				// ALL palettized shapes have a CLUT header with this magic value (ascii '!') being the first byte.
 				// So, if this isn't pressent, then we just return a empty shape and presume it's invalid.
 				if(ph.unknown[0] != 0x21) {
-					images.push_back({});
-					return {};
+					image.data.clear();
+					images.push_back(image);
+					return image;
 				}
 
 				switch(image.format) {

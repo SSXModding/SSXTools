@@ -13,6 +13,7 @@ find_package(Threads)
 #
 # This option is provided for other projects to allow importing SHPSCore without also importing the EAGLE UI projects (and causing clutter).
 option(EAGLE_SHPSCORE_ONLY "Turn this option on if you want to use SHPSCore in your projects" OFF)
+option(EAGLE_DISABLE_QT "Disable building the QT graphical user interface of EAGLe" OFF)
 
 
 if(MSVC)
@@ -72,6 +73,8 @@ add_subdirectory(vendor/mcommon)
 add_subdirectory(src/core)
 
 if(NOT EAGLE_SHPSCORE_ONLY)
-
 	add_subdirectory(src/eaglecli)
+	if(NOT EAGLE_DISABLE_QT)
+		add_subdirectory(src/eagleqt)
+	endif()
 endif()

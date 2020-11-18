@@ -26,6 +26,9 @@
       <height>401</height>
      </rect>
     </property>
+    <attribute name="headerVisible">
+     <bool>false</bool>
+    </attribute>
    </widget>
    <widget class="QFrame" name="previewFrame">
     <property name="enabled">
@@ -46,6 +49,9 @@
      <enum>QFrame::Sunken</enum>
     </property>
     <widget class="QLabel" name="openfilenag">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -61,7 +67,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Open a .BIG or .SSH file to get started...</string>
+      <string>Open a .SSH file to get started...</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -83,7 +89,6 @@
      <string>File</string>
     </property>
     <addaction name="openSSH"/>
-    <addaction name="openBig"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -97,6 +102,9 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="openSSH">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Open .SSH</string>
    </property>
@@ -117,8 +125,11 @@
    </property>
   </action>
   <action name="openBig">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>Open .BIG</string>
+    <string>Open .BIG (Unsupported for right now, sorry!)</string>
    </property>
   </action>
   <action name="aboutQt">

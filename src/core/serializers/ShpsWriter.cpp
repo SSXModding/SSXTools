@@ -80,25 +80,25 @@ namespace eagle {
 
 		bool ShpsWriter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image) {
 			if(image.data.empty()) {
-				logger.error("Image ", image.index, " is empty or unknown format!");
+				//logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
 			}
 
 			bool ssxHack = ShouldEnableSSXHack(image);
 
-			if(ssxHack)
-				logger.info("Enabling FIXSSH.BAT hack cause alpha was <= 128");
+			//if(ssxHack)
+			//	logger.info("Enabling FIXSSH.BAT hack cause alpha was <= 128");
 
-			logger.info("Writing image ", image.index, "...");
+			//logger.info("Writing image ", image.index, "...");
 
-			logger.info("Information on image ", image.index, ':');
-			logger.info("Width x Height: ", image.width, 'x', image.height);
+			//logger.info("Information on image ", image.index, ':');
+			//logger.info("Width x Height: ", image.width, 'x', image.height);
 
 			imageBuffer.resize((image.width * image.height * CHANNEL_COUNT));
 
 			switch(image.format) {
 				case shps::ShpsImageType::Lut128: {
-					logger.info("Image ", image.index, " is an 4bpp image.");
+					//logger.info("Image ", image.index, " is an 4bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
 
 					// Current pixel.
@@ -123,7 +123,7 @@ namespace eagle {
 				} break;
 
 				case shps::ShpsImageType::Lut256: {
-					logger.info("Image ", image.index, " is an 8bpp image.");
+					//logger.info("Image ", image.index, " is an 8bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
 
 					// Current pixel.
@@ -149,7 +149,7 @@ namespace eagle {
 				} break;
 
 				case shps::ShpsImageType::NonLut32Bpp: {
-					logger.info("Image ", image.index, " is an 32bpp image.");
+					//logger.info("Image ", image.index, " is an 32bpp image.");
 
 					byte* normalizedDataPtr = imageBuffer.data();
 
@@ -187,8 +187,7 @@ namespace eagle {
 
 		bool ShpsWriter::WritePNG(core::shps::Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
 			// avoid weird images entirely,
-			// helps avoid crashing on Refpack SSHes
-			// (yes, these are a thing, and yes, I despise them)
+			// helps avoid crashing on certain things
 			if(image.data.empty()) {
 				logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
@@ -204,6 +203,7 @@ namespace eagle {
 			if(!BuildImageBuffer(imageData, image)) {
 				logger.error("Could not build image buffer...");
 			}
+
 
 			// Finally, write the PNG after we've made the data buffers.
 			stbi_write_png(outFilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));

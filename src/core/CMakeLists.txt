@@ -4,6 +4,9 @@ set(SHPS_SOURCES
 	Core.h
 	EndianSwap.h
 	
+	readers/GimexInterleavedCodec.h
+	readers/GimexInterleavedCodec.cpp
+
 	readers/ShpsReader.h
 	readers/ShpsReader.cpp
 	

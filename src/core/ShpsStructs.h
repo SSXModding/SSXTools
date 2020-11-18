@@ -11,9 +11,14 @@ namespace eagle {
 
 			// Gimex version for SSX (2000). Doesn't seem to put a real version here
 			constexpr static uint32 GimexVersion_SSX = make_fourcc("GIMX");
-
+			
 			// Gimex version for SSX Tricky (2001).
 			constexpr static uint32 GimexVersion_SSXT = make_fourcc("G278");
+
+			// Gimex version for SSX 3.
+			constexpr static uint32 GimexVersion_SSX3 = make_fourcc("G357");
+
+
 
 			/*
 			 * Header of Gimex shape files. 
@@ -58,8 +63,10 @@ namespace eagle {
 				uint32 StartOffset;
 			};
 
-			// This is taken from the first byte in ShpsImageHeader.
-			// These seem to stay the same for certain image types.
+		
+			/**
+			 * Shape image format.
+			 */
 			enum class ShpsImageType : byte {
 				Unknown,
 
@@ -72,11 +79,19 @@ namespace eagle {
 				// 32bpp BGRA, no LUT
 				NonLut32Bpp = 0x05
 			};
+			
+			// this is probably a byte like ImageType
+			enum EncodingType : uint32 {
+				None,
+				Interleaved = 0x00200000,
+				Unknown
+			};
 
 			/**
 			 * Shape file per-image header
 			 */
 			struct ImageHeader {
+				
 				uint16 width;
 
 				uint16 height;
@@ -137,11 +152,9 @@ namespace eagle {
 			 * EAGLE-specific extension structure to hold image data as well
 			 */
 			struct Image : public shps::ImageHeader {
-				// MOVE THESE BACK INTO THE HEADER!!!
-				// we don't read the whole file but we might have to soon
-				// when we do that we can just do casting upon it
+				// These unfortunately have to be put here
 
-				ShpsImageType format; // this is a bitfield in EAC headers, this absoultely does not need to be one though
+				ShpsImageType format;
 
 				// 24-bit offset to CLUT relative to the start of the shape header
 				uint32 clut_offset;
