@@ -1,7 +1,7 @@
 #pragma once
-#include <Core.h>
+#include "../../include/eagle/Core.h"
 
-#include <ShpsStructs.h>
+#include "../../include/eagle/ShpsStructs.h"
 
 #define INQT
 #include <serializers/ShpsWriter.h>

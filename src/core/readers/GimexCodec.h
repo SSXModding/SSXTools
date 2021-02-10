@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Core.h>
-#include <ShpsStructs.h>
+#include "../../../include/eagle/Core.h"
+#include "../../../include/eagle/ShpsStructs.h"
 
-namespace eagle {
-namespace core {
+namespace eagle::core {
+
+	// TODO: Is this a internal header?
 
 	enum class CodecResult : byte {
 		OK,
@@ -20,7 +21,6 @@ namespace core {
 	 * Gimex codec interface.
 	 */
 	struct BaseGimexCodec {
-		
 		/**
 		 * Encode the image data.
 		 * 
@@ -34,5 +34,4 @@ namespace core {
 		virtual std::vector<byte> Decode(const shps::Image& image) = 0;
 	};
 
-}
-}
+} // namespace eagle::core

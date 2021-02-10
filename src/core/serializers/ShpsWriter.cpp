@@ -1,16 +1,14 @@
 #include <vector>
 #include <sstream>
-#include "serializers/ShpsWriter.h"
-#include "Core.h"
-
+#include <eagle/ShpsWriter.h>
+#include <eagle/Core.h>
 
 // TODO: Switch to a real libpng
 #include "stb_image_write.h"
 
 using namespace eagle::core;
 
-namespace eagle {
-	namespace core {
+namespace eagle::core {
 
 		/**
 		 * Multiply an stored byte.
@@ -47,7 +45,7 @@ namespace eagle {
 				return c != 255 && c != 0 /* Seems to fix some other textures */ && std::max(c, (byte)128) == 128;
 			};
 
-			shps::Bgra8888 MaxColor;
+			shps::Bgra8888 MaxColor{};
 
 			if(image.palette.empty()) {
 				// Detour to a much slower impl
@@ -67,10 +65,6 @@ namespace eagle {
 
 			}
 
-			// bodge
-#if 0
-			return false;
-#endif
 			// seems the best way to detect this hack is to test just the alpha
 			return test(MaxColor.a);
 		}
@@ -159,7 +153,7 @@ namespace eagle {
 					// Also saves a bit of typing, as we won't have to manually
 					// advance 4 bytes and cast to Bgra8888* each and every time.
 					// We can just increment the pointer!
-					shps::Bgra8888* texPixelPtr = (shps::Bgra8888*)image.data.data();
+					auto* texPixelPtr = (shps::Bgra8888*)image.data.data();
 
 					// Write each pixel to the image buffer that we save.
 					for(int i = 0; i < image.width * image.height; ++i) {
@@ -215,5 +209,4 @@ namespace eagle {
 			return true;
 		}
 
-	} // namespace core
-} // namespace eagle
+	} // namespace eagle

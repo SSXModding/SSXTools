@@ -5,7 +5,7 @@
 #include <QStandardItemModel>
 #include <QThread>
 
-#include <Core.h>
+#include "../../include/eagle/Core.h"
 #define INQT
 #include <readers/ShpsReader.h>
 #include <serializers/ShpsWriter.h>

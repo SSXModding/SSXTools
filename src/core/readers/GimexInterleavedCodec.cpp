@@ -1,19 +1,19 @@
-#include <Core.h>
+#include "../../../include/eagle/Core.h"
 #include "GimexInterleavedCodec.h"
 
 #include <map>
 
-namespace eagle {
-	namespace core {
+namespace eagle::core {
 
-		// local coord
-		struct Coord {
-			uint16 x;
-			uint16 y;
-		};
+	// local coord
+	struct Coord {
+		uint16 x;
+		uint16 y;
+	};
 
-		// todo: There's probably a way we can do away with this
-		const static std::map<Coord, Coord> DecodeMap {
+	// todo: There's probably a way we can do away with this
+	// clang-format off
+		const static std::vector<std::tuple<Coord, Coord>> DecodeMap { // NOLINT
 			{ { 0, 0 }, { 0, 0 } },
 			{ { 0, 1 }, { 0, 4 } },
 			{ { 0, 2 }, { 0, 8 } },
@@ -79,17 +79,17 @@ namespace eagle {
 			{ { 7, 6 }, { 6, 25 } },
 			{ { 7, 7 }, { 6, 29 } }
 		};
+	// clang-format on
 
-		//shps::Bgra8888 GetPixel()
+	//shps::Bgra8888 GetPixel()
 
-		std::vector<byte> InterleavedCodec::Encode(const shps::Image& image) {
-			// currently unupported
-			return image.data;
-		}
+	std::vector<byte> InterleavedCodec::Encode(const shps::Image& image) {
+		// currently unsupported
+		return image.data;
+	}
 
-		std::vector<byte> InterleavedCodec::Decode(const shps::Image& image) {
-			return image.data;
-		}
+	std::vector<byte> InterleavedCodec::Decode(const shps::Image& image) {
+		return image.data;
+	}
 
-	} // namespace core
-} // namespace eagle
+} // namespace eagle::core

@@ -7,8 +7,8 @@
 #include <modeco/Logger.h>
 #include <modeco/IostreamLoggerSink.h>
 
-#include "readers/ShpsReader.h"
-#include "serializers/ShpsWriter.h"
+#include <eagle/ShpsReader.h>
+#include <eagle/ShpsWriter.h>
 
 using namespace eagle::core;
 

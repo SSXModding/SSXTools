@@ -1,16 +1,16 @@
 # TODO This should be a generic library
 
 set(SHPS_SOURCES
-	Core.h
-	EndianSwap.h
+        ../../include/eagle/Core.h
+        ../../include/eagle/EndianSwap.h
 	
 	readers/GimexInterleavedCodec.h
 	readers/GimexInterleavedCodec.cpp
 
-	readers/ShpsReader.h
+		../../include/eagle/ShpsReader.h
 	readers/ShpsReader.cpp
-	
-	serializers/ShpsWriter.h
+
+		../../include/eagle/ShpsWriter.h
 	serializers/ShpsWriter.cpp
 	serializers/stbimpl.cpp
 )
@@ -20,9 +20,11 @@ add_library(eagle-core STATIC ${SHPS_SOURCES})
 set_property(TARGET eagle-core PROPERTY CXX_STANDARD 17)
 set_property(TARGET eagle-core PROPERTY CXX_STANDARD_REQUIRED ON)
 
-# Publicize includes here as they're the public API for eagle-core.
 target_include_directories(eagle-core PUBLIC ${PROJECT_SOURCE_DIR}/vendor)
-target_include_directories(eagle-core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(eagle-core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Publicize includes here as they're the public API for eagle-core.
+target_include_directories(eagle-core PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Link additional libraries required for using the 
 # filesystem library with libc++ and libstdc++.
