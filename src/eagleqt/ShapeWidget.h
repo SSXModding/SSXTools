@@ -1,10 +1,10 @@
 #pragma once
-#include "../../include/eagle/Core.h"
+#include <eagle/Core.h>
 
-#include "../../include/eagle/ShpsStructs.h"
+#include <eagle/ShpsStructs.h>
 
 #define INQT
-#include <serializers/ShpsWriter.h>
+#include <eagle/ShpsWriter.h>
 #undef INQT
 
 #include <QWidget>

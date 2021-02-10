@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../../../include/eagle/Core.h"
-
+#include <eagle/Core.h>
 #include "GimexCodec.h"
 
 namespace eagle::core {

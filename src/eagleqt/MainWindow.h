@@ -5,10 +5,10 @@
 #include <QStandardItemModel>
 #include <QThread>
 
-#include "../../include/eagle/Core.h"
+#include <eagle/Core.h>
 #define INQT
-#include <readers/ShpsReader.h>
-#include <serializers/ShpsWriter.h>
+#include <eagle/ShpsReader.h>
+#include <eagle/ShpsWriter.h>
 #undef INQT
 
 #include "ui_MainWindow.h"
