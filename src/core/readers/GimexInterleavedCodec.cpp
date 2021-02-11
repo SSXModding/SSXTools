@@ -1,4 +1,4 @@
-#include "../../../include/eagle/Core.h"
+#include <eagle/Core.h>
 #include "GimexInterleavedCodec.h"
 
 #include <map>

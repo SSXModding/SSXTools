@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../include/eagle/Core.h"
-#include "../../../include/eagle/ShpsStructs.h"
+#include <eagle/Core.h>
+#include <eagle/ShpsStructs.h>
 
 namespace eagle::core {
 
