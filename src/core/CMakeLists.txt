@@ -1,16 +1,13 @@
 # TODO This should be a generic library
 
 set(SHPS_SOURCES
-        ../../include/eagle/Core.h
-        ../../include/eagle/EndianSwap.h
-	
-	readers/GimexInterleavedCodec.h
+    ../../include/eagle/Core.h
+    ../../include/eagle/EndianSwap.h
 	readers/GimexInterleavedCodec.cpp
-
-		../../include/eagle/ShpsReader.h
+	../../include/eagle/ShpsReader.h
 	readers/ShpsReader.cpp
 
-		../../include/eagle/ShpsWriter.h
+	../../include/eagle/ShpsWriter.h
 	serializers/ShpsWriter.cpp
 	serializers/stbimpl.cpp
 )

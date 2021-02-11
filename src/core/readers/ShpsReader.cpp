@@ -6,7 +6,6 @@
 #include <eagle/ShpsReader.h>
 
 #include "GimexCodec.h"
-#include "GimexInterleavedCodec.h"
 
 // needed for refpack shape decompression
 #include <bigfile/refpack.h>
@@ -110,7 +109,7 @@ namespace eagle::core {
 		// Make the codec beforehand if we need to
 		switch(image.unknown2) { // TODO: all G357 shapes that are 8bpp seem to require this, so maybe check for THAT?
 			case shps::EncodingType::Interleaved:
-				codec = std::make_shared<InterleavedCodec>();
+				codec = core::MakeInterleavedCodec();
 				break;
 
 			default:
@@ -138,8 +137,12 @@ namespace eagle::core {
 
 		// If we need to decode the image data using a gimex codec,
 		// then do so before reading in the CLUT
-		if(codec)
-			image.data = codec->Decode(image);
+		if(codec) {
+			CodecResult res = codec->Decode(image);
+			if(res != CodecResult::OK) {
+				// error decoding..
+			}
+		}
 
 		// Read in the CLUT if we need to.
 		if(readclut) {

@@ -1,7 +1,5 @@
 #include <eagle/Core.h>
-#include "GimexInterleavedCodec.h"
-
-#include <map>
+#include "GimexCodec.h"
 
 namespace eagle::core {
 
@@ -81,15 +79,59 @@ namespace eagle::core {
 		};
 	// clang-format on
 
-	//shps::Bgra8888 GetPixel()
 
-	std::vector<byte> InterleavedCodec::Encode(const shps::Image& image) {
-		// currently unsupported
-		return image.data;
+	constexpr std::size_t GetIndexForCoord(const shps::Image& image, Coord location) {
+		return location.y * image.width + location.x;
 	}
 
-	std::vector<byte> InterleavedCodec::Decode(const shps::Image& image) {
-		return image.data;
+	Coord FindCoordInDecodeMap(Coord encoded) {
+		for(auto [lv, rv] : DecodeMap) {
+				if(encoded.x == lv.x && encoded.y == lv.y)
+					return rv;
+		}
+		return {};
+	}
+
+	byte GetDecodedPixel(const shps::Image& image, Coord location) {
+		//auto decoded = FindCoordInDecodeMap()
+	}
+
+	/**
+	 * GIMEX 3 interleaved codec
+	 */
+	struct InterleavedCodec : public BaseGimexCodec {
+			std::tuple<CodecResult, std::optional<shps::Image>> Encode(const shps::Image& image) override {
+				// currently unsupported
+				// TODO i should implement when EAGLe gets writing...
+				return std::make_tuple(CodecResult::OK, shps::Image(image));
+			}
+
+			CodecResult Decode(shps::Image& image) override {
+				// Bail if the image is not Lut256,
+				// cause 32-bpp G3 shapes are not interleaved.
+
+				if(image.format != shps::ShpsImageType::Lut256)
+					return CodecResult::ErrorDecoding;
+
+				// We intentionally make a copy of the image we are given,
+				// so if something breaks
+				shps::Image copy{image};
+
+				for(int x = 0; x < image.width; ++x) {
+					for(int y = 0; y < image.height; ++y) {
+						const Coord c = {(uint16)x, (uint16)y};
+						copy.data[GetIndexForCoord(image, c)] = GetDecodedPixel(image, c);
+					}
+				}
+
+				return CodecResult::OK;
+			}
+	};
+
+	// moved this to a factory style thing cause its cleaner that way
+
+	std::shared_ptr<BaseGimexCodec> MakeInterleavedCodec() {
+		return std::make_shared<InterleavedCodec>();
 	}
 
 } // namespace eagle::core

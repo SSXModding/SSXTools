@@ -14,9 +14,6 @@ namespace eagle::core {
 		ErrorInputInvalid
 	};
 
-	// TODO: use CRTP for a eeny bit less runtime overhead
-	// (all cases are static so crtp would work just fine)
-
 	/**
 	 * Gimex codec interface.
 	 */
@@ -26,12 +23,20 @@ namespace eagle::core {
 		 * 
 		 * Doesn't need to be implemented yet
 		 */
-		virtual std::vector<byte> Encode(const shps::Image& image) = 0;
+		virtual std::tuple<CodecResult, std::optional<shps::Image>> Encode(const shps::Image& image) = 0;
 
 		/**
 		 * Decode the image data.
+		 *
+		 * \return CodecResult::OK on success
 		 */
-		virtual std::vector<byte> Decode(const shps::Image& image) = 0;
+		virtual CodecResult Decode(shps::Image& image) = 0;
 	};
+
+	/**
+	 * Create a GIMEX interleaved shape codec.
+	 * @return
+	 */
+	std::shared_ptr<BaseGimexCodec> MakeInterleavedCodec();
 
 } // namespace eagle::core
