@@ -79,7 +79,7 @@ namespace eagle::core {
 	using uint24le = detail::basic_uint24<false>;
 
 	/**
-	 * endian unsigned 24-bit integer.
+	 * Big endian unsigned 24-bit integer.
 	 */
 	using uint24be = detail::basic_uint24<true>;
 

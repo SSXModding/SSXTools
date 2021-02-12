@@ -4,7 +4,7 @@
 #include <eagle/ShpsStructs.h>
 
 #define INQT
-#include <eagle/ShpsWriter.h>
+#include <eagle/ShpsConverter.h>
 #undef INQT
 
 #include <QWidget>

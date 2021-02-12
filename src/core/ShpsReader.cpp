@@ -5,15 +5,14 @@
 #include <eagle/EndianSwap.h>
 #include <eagle/ShpsReader.h>
 
-#include "GimexCodec.h"
-
 // needed for refpack shape decompression
 #include <bigfile/refpack.h>
 
 namespace eagle::core {
 
 	/**
-	 * template function to read palette
+	 * Template function to read palette so I don't repeat myself as much
+	 * Hopefully this gets turned into distinct functions..?
 	 * \tparam N amount of colors to read
 	 */
 	template<int N>
@@ -73,7 +72,12 @@ namespace eagle::core {
 		// CLUT
 		bool readclut = false;
 		shps::Image image;
-		std::shared_ptr<BaseGimexCodec> codec;
+
+		auto error = [&image]() {
+			// clear fields on error
+			image.data.clear();
+			image.palette.clear();
+		};
 
 		image.index = imageIndex;
 		image.toc_entry = tocEntry;
@@ -84,11 +88,13 @@ namespace eagle::core {
 		reader.ReadSingleType<shps::ImageHeader>(image);
 
 		// fix the format of refpack shapes
-		// This is a hack and I really should be masking out 0x80,
-		// but this should work for 95% of cases for now
-#define FIX_SHAPE_FORMAT(n, type)                   \
-	if(image.format == (shps::ShpsImageType)0x8##n) \
-		image.format = shps::ShpsImageType::type;
+		// This is a hack and I really should be masking out 0xn0,
+		// but this should work for right now.
+		// If this ends up requiring more I'll fix it.
+
+#define FIX_SHAPE_FORMAT(n, type)                    \
+	if(image.format == (shps::ShapeImageType)0x8##n) \
+		image.format = shps::ShapeImageType::type;
 
 		FIX_SHAPE_FORMAT(2, Lut256);
 		FIX_SHAPE_FORMAT(5, NonLut32Bpp);
@@ -106,16 +112,6 @@ namespace eagle::core {
 			size = (image.width * image.height) * sizeof(shps::Bgra8888);
 		}
 
-		// Make the codec beforehand if we need to
-		switch(image.unknown2) { // TODO: all G357 shapes that are 8bpp seem to require this, so maybe check for THAT?
-			case shps::EncodingType::Interleaved:
-				codec = core::MakeInterleavedCodec();
-				break;
-
-			default:
-				break;
-		}
-
 		// Resize the data buffer and read the entire image's data into it.
 		image.data.resize(size);
 		reader.ReadRawBuffer((char*)image.data.data(), size);
@@ -125,26 +121,20 @@ namespace eagle::core {
 		if(image.data[0] == 0x10 && image.data[1] == 0xFB) {
 			auto decompressed = bigfile::refpack::Decompress(bigfile::MakeSpan(image.data.data(), size)); // TODO: BIGFILE SHOULD USE MCOMMON SPAN!!!
 
-			// Resize the image buffer to the decompressed image data size.
+			// refpack::Decompress returns an empty vector on decompression failure.
+			if(decompressed.empty()) {
+				error();
+				return image;
+			}
+
+			// Resize the image buffer to fit decompressed data.
 			image.data.resize(decompressed.size());
 
-			// Copy data back into the image data as decompressed data
+			// Copy the decompressed data into the image.
 			memcpy(&image.data[0], &decompressed[0], decompressed.size() * sizeof(byte));
-
-			// Clear the temporary decompression buffer, as we no longer need it.
-			//decompressed.clear();
 		}
 
-		// If we need to decode the image data using a gimex codec,
-		// then do so before reading in the CLUT
-		if(codec) {
-			CodecResult res = codec->Decode(image);
-			if(res != CodecResult::OK) {
-				// error decoding..
-			}
-		}
-
-		// Read in the CLUT if we need to.
+		// Read in the CLUT header if we are a palettized shape.
 		if(readclut) {
 			reader.raw().seekg(tocEntry.StartOffset + image.clut_offset, std::istream::beg);
 			shps::PaletteHeader ph {};
@@ -153,23 +143,51 @@ namespace eagle::core {
 			// ALL palettized shapes have a CLUT header with this magic value (ascii '!') being the first byte.
 			// So, if this isn't pressent, then we just return a empty shape and presume it's invalid.
 			if(ph.unknown[0] != 0x21) {
-				image.data.clear();
-				images.push_back(image);
+				error();
+				//images.push_back(image);
 				return image;
 			}
 
 			// Read colors out depending on the image type.
 			switch(image.format) {
-				case shps::ShpsImageType::Lut128:
+				case shps::ShapeImageType::Lut128:
 					ReadPalette<16>(image.palette, reader);
 					break;
 
-				case shps::ShpsImageType::Lut256:
+				case shps::ShapeImageType::Lut256:
 					ReadPalette<256>(image.palette, reader);
 					break;
 
 				default:
 					break;
+			}
+
+			// In a old version I had this explicitly checking for the Gimex version 3 shapes have
+			// ... i should probably do that still ....
+			auto IsSSX3Shape = [&]() -> bool {
+				// TODO: don't endian swap where not needed (portability matters...)
+				return !(EndianSwap(header.creator) == shps::GimexVersion_SSX
+					   || EndianSwap(header.creator) == shps::GimexVersion_SSXT);
+			};
+
+			if(IsSSX3Shape() && image.format == shps::ShapeImageType::Lut256) {
+				std::vector<shps::Bgra8888> palette_copy { image.palette.size() };
+				constexpr int tile_x = 8;
+				constexpr int tile_y = 2;
+
+				// this is a certified hack... But it works..
+				// maybe it isn't a hack.. Who knows?
+				int ntx = 16 / tile_x;
+				int nty = 16 / tile_y;
+				int i = 0;
+
+				for(int ty = 0; ty < nty; ty++)
+					for(int tx = 0; tx < ntx; tx++)
+						for(int y = 0; y < tile_y; y++)
+							for(int x = 0; x < tile_x; x++)
+								palette_copy[(ty * tile_y + y) * 16 + (tx * tile_x + x)] = image.palette[i++];
+
+				image.palette = palette_copy;
 			}
 		}
 

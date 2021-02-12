@@ -8,7 +8,7 @@
 #include <modeco/IostreamLoggerSink.h>
 
 #include <eagle/ShpsReader.h>
-#include <eagle/ShpsWriter.h>
+#include <eagle/ShpsConverter.h>
 
 using namespace eagle::core;
 
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 	std::ifstream stream(input_filename, std::ifstream::in | std::ifstream::binary);
 
 	if(!stream) {
-		std::cout << "Could not open file for reading\n";
+		logger.error("Could not open file ", input_filename, " for reading.");
 		return 1;
 	}
 
@@ -52,9 +52,7 @@ int main(int argc, char** argv) {
 		logger.error("Invalid SHPS header!");
 		return 1;
 	}
-
 	reader.ReadTOC();
-
 	shps::FileHeader& header = reader.GetHeader();
 
 	logger.info("Shape File Information: ");
@@ -66,13 +64,13 @@ int main(int argc, char** argv) {
 	logger.info("  Total File Size:", (float)header.FileLength / 1000, " kB");
 	logger.info("  Image Count:", header.FileTextureCount, " files");
 
-	// Read every image into the ShpsReader/SHPSCore format
+	// Read every image into the ShpsReader/core format
 	for(uint32 i = 0; i < header.FileTextureCount; ++i)
 		reader.ReadImage(i);
 
 	auto& images = reader.GetImages();
 
-	ShpsWriter writer;
+	ShpsConverter writer;
 
 	// Write every image in the texture bank to a PNG file.
 	for(uint32 i = 0; i < header.FileTextureCount; ++i)

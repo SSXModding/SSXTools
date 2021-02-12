@@ -8,7 +8,7 @@
 #include <eagle/Core.h>
 #define INQT
 #include <eagle/ShpsReader.h>
-#include <eagle/ShpsWriter.h>
+#include <eagle/ShpsConverter.h>
 #undef INQT
 
 #include "ui_MainWindow.h"
@@ -42,7 +42,7 @@ namespace eagle {
 
 			// TODO: Refactor!!!!
 			std::vector<shps::Image> images;
-			core::ShpsWriter writer;
+			core::ShpsConverter writer;
 
 			ShapeWidget* shapeWidget;
 		};

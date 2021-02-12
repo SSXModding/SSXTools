@@ -21,7 +21,7 @@ namespace eagle {
 		/**
 		 * The SHPS->PNG writer component of EAGLe.
 		 */
-		struct ShpsWriter {
+		struct ShpsConverter {
 
 			/**
 			 * Builds a normal 32bpp RGBA image from a SHPS image.
@@ -32,6 +32,7 @@ namespace eagle {
 			 */
 			bool BuildImageBuffer(std::vector<byte>& imageBuffer, shps::Image& image);
 
+			// TODO: seperate ShpsPNGWriter class, please!
 			/**
 			 * Write the provided SHPS image to a PNG file.
 			 *
@@ -46,7 +47,7 @@ namespace eagle {
 
 		private:
 
-			mco::Logger logger = mco::Logger::CreateLogger("SHPSWriter");
+			mco::Logger logger = mco::Logger::CreateLogger("SHPSConverter");
 		};
 
 	} // namespace core

@@ -1,15 +1,13 @@
 # TODO This should be a generic library
 
 set(SHPS_SOURCES
-    ../../include/eagle/Core.h
-    ../../include/eagle/EndianSwap.h
-	readers/GimexInterleavedCodec.cpp
-	../../include/eagle/ShpsReader.h
-	readers/ShpsReader.cpp
-
-	../../include/eagle/ShpsWriter.h
-	serializers/ShpsWriter.cpp
-	serializers/stbimpl.cpp
+    	../../include/eagle/Core.h
+    	../../include/eagle/EndianSwap.h
+		../../include/eagle/ShpsReader.h
+		../../include/eagle/ShpsConverter.h
+		ShpsReader.cpp
+		ShpsConverter.cpp
+		stbimpl.cpp
 )
 
 add_library(eagle-core STATIC ${SHPS_SOURCES})
@@ -20,11 +18,11 @@ set_property(TARGET eagle-core PROPERTY CXX_STANDARD_REQUIRED ON)
 target_include_directories(eagle-core PUBLIC ${PROJECT_SOURCE_DIR}/vendor)
 target_include_directories(eagle-core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Publicize includes here as they're the public API for eagle-core.
+# $ROOT/include is the public API for eagle-core
 target_include_directories(eagle-core PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Link additional libraries required for using the 
-# filesystem library with libc++ and libstdc++.
+# filesystem library with libc++ and libstdc++, if we need to.
 if(EAGLE_STDLIB STREQUAL "libc++")
 	target_link_libraries(eagle-core c++fs)
 elseif(EAGLE_STDLIB STREQUAL "libstdc++")

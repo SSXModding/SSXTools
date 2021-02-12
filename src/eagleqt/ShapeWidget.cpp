@@ -5,7 +5,7 @@ namespace eagle {
 	namespace ui {
 
 		void ShapeWidget::PaintShape(core::shps::Image& shape) {
-			core::ShpsWriter writer;
+			core::ShpsConverter writer;
 			std::vector<mco::byte> rawBuffer;
 
 			if(!writer.BuildImageBuffer(rawBuffer, shape))

@@ -1,9 +1,10 @@
 #include <vector>
 #include <sstream>
-#include <eagle/ShpsWriter.h>
+#include <eagle/ShpsConverter.h>
 #include <eagle/Core.h>
 
 // TODO: Switch to a real libpng
+//
 #include "stb_image_write.h"
 
 using namespace eagle::core;
@@ -11,7 +12,7 @@ using namespace eagle::core;
 namespace eagle::core {
 
 		/**
-		 * Multiply an stored byte.
+		 * Multiply a stored byte.
 		 *
 		 * \param[in] val val.
 		 */
@@ -22,7 +23,7 @@ namespace eagle::core {
 			// because it could overflow and break images.
 			if(val < 128)
 				return val * 2;
-			else if(val == 128) // is another branch needed?
+			else if(val == 128) // TODO: is another branch needed? (useless perf improvement..?)
 				return 255;
 
 			// I don't know how you'd ever get beyond the following point
@@ -33,7 +34,7 @@ namespace eagle::core {
 		// TODO: we should only detour to this if the user doesn't give an option
 		// whether in the UI (i don't know where I'd put this) or in the cli (say --disable-ssxhack or --enable-ssxhack)
 		/**
-		 * Function called **ONCE** on the ShpsImage to determine if it possibly
+		 * Function called **ONCE** on the shps::Image to determine if it possibly
 		 * went through the fabled
 		 * `FIXSSH.BAT` (the Winter Jampack 2001 build of SSX Tricky accidentally shipped with this)
 		 * aka `gx -pixela/2,r/2,g/2,b/2 -csm2 %1`.
@@ -65,6 +66,10 @@ namespace eagle::core {
 
 			}
 
+			// TODO: Fix this hack detection,
+			// or have the user explicitly enable it.
+
+			return false;
 			// seems the best way to detect this hack is to test just the alpha
 			return test(MaxColor.a);
 		}
@@ -72,7 +77,7 @@ namespace eagle::core {
 		// Constant amount of channels in the output PNG.
 		constexpr int32 CHANNEL_COUNT = 4;
 
-		bool ShpsWriter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image) {
+		bool ShpsConverter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image) {
 			if(image.data.empty()) {
 				//logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
@@ -91,11 +96,9 @@ namespace eagle::core {
 			imageBuffer.resize((image.width * image.height * CHANNEL_COUNT));
 
 			switch(image.format) {
-				case shps::ShpsImageType::Lut128: {
+				case shps::ShapeImageType::Lut128: {
 					//logger.info("Image ", image.index, " is an 4bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
-
-					// Current pixel.
 					byte* texPixelPtr = image.data.data();
 
 					// Write each pixel to the image buffer that we save.
@@ -116,8 +119,8 @@ namespace eagle::core {
 					}
 				} break;
 
-				case shps::ShpsImageType::Lut256: {
-					//logger.info("Image ", image.index, " is an 8bpp image.");
+				case shps::ShapeImageType::Lut256: {
+					logger.info("Image ", image.index, " is an 8bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
 
 					// Current pixel.
@@ -142,8 +145,8 @@ namespace eagle::core {
 					}
 				} break;
 
-				case shps::ShpsImageType::NonLut32Bpp: {
-					//logger.info("Image ", image.index, " is an 32bpp image.");
+				case shps::ShapeImageType::NonLut32Bpp: {
+					logger.info("Image ", image.index, " is an 32bpp image.");
 
 					byte* normalizedDataPtr = imageBuffer.data();
 
@@ -179,7 +182,7 @@ namespace eagle::core {
 			return true;
 		}
 
-		bool ShpsWriter::WritePNG(core::shps::Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
+		bool ShpsConverter::WritePNG(core::shps::Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
 			// avoid weird images entirely,
 			// helps avoid crashing on certain things
 			if(image.data.empty()) {
