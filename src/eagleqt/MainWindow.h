@@ -14,10 +14,9 @@
 #include "ui_MainWindow.h"
 #include "ShapeWidget.h"
 
-namespace eagle {
-	namespace ui {
+namespace eagle::ui {
 
-		using namespace eagle::core;
+		//using namespace eagle::core;
 
 		class MainWindow : public QMainWindow {
 			Q_OBJECT
@@ -33,7 +32,7 @@ namespace eagle {
 			 */
 			void OnOpenSSH();
 
-		   //public slots:
+			//public slots:
 			void OnSSHItemSelection(const QItemSelection& /*newSelection*/, const QItemSelection& /*oldSelection*/);
 
 		   private:
@@ -41,11 +40,10 @@ namespace eagle {
 			QStandardItemModel* item_model;
 
 			// TODO: Refactor!!!!
-			std::vector<shps::Image> images;
+			std::vector<core::shps::Image> images;
 			core::ShpsConverter writer;
 
 			ShapeWidget* shapeWidget;
 		};
 
-	} // namespace ui
-} // namespace eagle
+	} // namespace eagle

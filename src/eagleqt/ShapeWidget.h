@@ -10,31 +10,27 @@
 #include <QWidget>
 #include <QImage>
 
-namespace eagle {
-	namespace ui {
+namespace eagle::ui {
 
+	/**
+	 * Widget for displaying shape images.
+	 */
+	struct ShapeWidget : public QWidget {
+		Q_OBJECT
+	   public:
 		/**
-		 * Widget for displaying shape images.
+		 * Display a shape image.
+		 *
+		 * \param[in] shape The shape image to load and display.
 		 */
-		struct ShapeWidget : public QWidget {
-			Q_OBJECT
-		   public:
+		void PaintShape(core::shps::Image& shape);
 
-			/**
-			 * Display a shape image.
-			 * 
-			 * \param[in] shape The shape image to load and display.
-			 */
-			void PaintShape(core::shps::Image& shape);
+	   protected:
+		void paintEvent(QPaintEvent*);
 
-		   protected:
-			void paintEvent(QPaintEvent*);
+	   private:
+		QImage qtImage;
+		//core::shps::Image* painting_shape = nullptr;
+	};
 
-		   private:
-			QImage qtImage;
-			//core::shps::Image* painting_shape = nullptr;
-		};
-
-	} // namespace ui
-
-} // namespace eagle
+} // namespace eagle::ui

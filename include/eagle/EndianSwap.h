@@ -26,37 +26,37 @@
 	#error Unsupported compiler.
 #endif
 
-namespace eagle {
-	namespace core {
+namespace eagle::core {
 
-		/**
-		 * Swap the endian of a provided value.
-		 *
-		 * \tparam T Type
-		 * \param[in] value value to swap endian of
-		 */
-		template<typename T>
-		inline T EndianSwap(T value) {
-			if constexpr(sizeof(T) == 2) {
-				return BYTESWAP16((std::uint16_t)value);
-			} else if constexpr(sizeof(T) == 4) {
-				return BYTESWAP32((std::uint32_t)value);
-			} else if constexpr(sizeof(T) == 8) {
-				return BYTESWAP64((std::uint64_t)value);
-			} else {
-				// swap any structure like it's an array of shorts
-				T temp {};
-				memcpy(&temp, &value, sizeof(T));
+	/**
+	 * Swap the endian of a provided value.
+	 *
+	 * \tparam T Type
+	 * \param[in] value value to swap endian of
+	 */
+	template<typename T>
+	inline T EndianSwap(T value) {
+		static_assert(sizeof(T) > sizeof(std::uint16_t), "Structure needs to be at least 2 bytes");
 
-				for(int32 i = 0; i < sizeof(T); i += sizeof(std::uint16_t))
-					((std::uint16_t*)&temp)[i] = BYTESWAP16(((std::uint16_t*)&temp)[i]);
+		if constexpr(sizeof(T) == 2) {
+			return BYTESWAP16((std::uint16_t)value);
+		} else if constexpr(sizeof(T) == 4) {
+			return BYTESWAP32((std::uint32_t)value);
+		} else if constexpr(sizeof(T) == 8) {
+			return BYTESWAP64((std::uint64_t)value);
+		} else {
+			// swap any structure like it's an array of shorts
+			T temp {};
+			memcpy(&temp, &value, sizeof(T));
 
-				return temp;
-			}
+			for(int32 i = 0; i < sizeof(T); i += sizeof(std::uint16_t))
+				((std::uint16_t*)&temp)[i] = BYTESWAP16(((std::uint16_t*)&temp)[i]);
+
+			return temp;
 		}
+	}
 
-	} // namespace core
-} // namespace eagle
+} // namespace eagle::core
 
 #undef BYTESWAP16
 #undef BYTESWAP32

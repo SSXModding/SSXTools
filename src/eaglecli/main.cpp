@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
 	// While we could in theory get the size of the file from the stream itself,
 	// the file length member is faster to lookup and should always be correct, considering we verify
 	// by getting the size of the file from the stream anyways in ReadHeader().
-	
+
 	logger.info("  Total File Size:", (float)header.FileLength / 1000, " kB");
 	logger.info("  Image Count:", header.FileTextureCount, " files");
 

@@ -5,7 +5,6 @@
 #include <QTextStream>
 #include <QFileDialog>
 
-
 #include <QItemSelectionModel>
 
 namespace eagle {
@@ -42,7 +41,6 @@ namespace eagle {
 		}
 
 		MainWindow::~MainWindow() {
-
 			if(shapeWidget) {
 				delete shapeWidget;
 			}

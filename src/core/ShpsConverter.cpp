@@ -120,7 +120,7 @@ namespace eagle::core {
 				} break;
 
 				case shps::ShapeImageType::Lut256: {
-					logger.info("Image ", image.index, " is an 8bpp image.");
+					//logger.info("Image ", image.index, " is an 8bpp image.");
 					byte* normalizedDataPtr = imageBuffer.data();
 
 					// Current pixel.
@@ -146,7 +146,7 @@ namespace eagle::core {
 				} break;
 
 				case shps::ShapeImageType::NonLut32Bpp: {
-					logger.info("Image ", image.index, " is an 32bpp image.");
+					//logger.info("Image ", image.index, " is an 32bpp image.");
 
 					byte* normalizedDataPtr = imageBuffer.data();
 
@@ -204,7 +204,7 @@ namespace eagle::core {
 
 			// Finally, write the PNG after we've made the data buffers.
 			stbi_write_png(outFilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));
-			logger.info("Image ", image.index, " written to \"", outFilename, "\".");
+			logger.info("Image ", image.index, " (" , EnumToString(image.format), ")", " written to \"", outFilename, "\".");
 
 			// Clear the PNG data buffer after we're done.
 			imageData.clear();

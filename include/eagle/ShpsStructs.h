@@ -3,197 +3,217 @@
 #include <eagle/Core.h>
 #include <eagle/uint24.h>
 
-namespace eagle {
-	namespace core {
-		namespace shps {
+namespace eagle::core::shps {
 
-			// GIMEX versions.
-			// We'll need these for some Gimex version specific stuff
+	// GIMEX versions.
+	// We'll need these for some Gimex version specific stuff
 
-			// Gimex version for SSX (2000). Doesn't seem to put a real version here
-			constexpr static uint32 GimexVersion_SSX = make_fourcc("GIMX");
-			
-			// Gimex version for SSX Tricky (2001).
-			constexpr static uint32 GimexVersion_SSXT = make_fourcc("G278");
+	// Gimex version for SSX (2000). Doesn't seem to put a real version here
+	constexpr static uint32 GimexVersion_SSX = MakeFourCCValue("GIMX");
 
-			// Gimex version for SSX 3.
-			constexpr static uint32 GimexVersion_SSX3 = make_fourcc("G357");
+	// Gimex version for SSX Tricky (2001).
+	constexpr static uint32 GimexVersion_SSXT = MakeFourCCValue("G278");
 
+	// Gimex version for SSX 3.
+	constexpr static uint32 GimexVersion_SSX3 = MakeFourCCValue("G357");
+	constexpr static uint32 GimexVersion_SSX3Alt = MakeFourCCValue("G355"); // 091103 build
 
+	/*
+	 * Header of Gimex shape files.
+	 */
+	struct FileHeader {
+		// File magic (SHPS)
+		char Magic[4];
 
-			/*
-			 * Header of Gimex shape files. 
-			 */
-			struct FileHeader {
-				// File magic (SHPS)
-				char Magic[4];
+		/**
+		 * Size of the entire shape file in bytes.
+		 */
+		uint32 FileLength;
 
-				/**
-				 * Size of the entire shape file in bytes.
-				 */
-				uint32 FileLength;
+		/**
+		 * The count of textures in this shape file
+		 */
+		uint32 FileTextureCount;
 
-				/**
-				 * The count of textures in this shape file
-				 */
-				uint32 FileTextureCount;
+		/**
+		 * A 4-byte code of the version of Gimex
+		 * used to create the shape file.
+		 */
+		uint32 creator;
 
-				/**
-				 * A 4-byte code of the version of Gimex
-				 * used to create the shape file.
-				 */
-				uint32 creator;
+		// TODO: use the array hack that gimex seems to already use?
+	};
 
-				// TODO: use the array hack that gimex seems to already use?
-			};
+	/**
+	 * Shape file TOC entry
+	 */
+	struct TocEntry {
+		/**
+		 * Name of the image.
+		 */
+		// NOTE: SSX 3 has a Gimex extension that sometimes puts the full
+		// name of the texture after the clut.
+		char Name[4];
 
-			/**
-			 * Shape file TOC entry
-			 */
-			struct TocEntry {
-				/**
-				 * Name of the image.
-				 */
-				// NOTE: SSX 3 has a Gimex extension that sometimes puts the full
-				// name of the texture after the clut.
-				char Name[4];
+		/**
+		 * Start offset.
+		 */
+		uint32 StartOffset;
+	};
 
-				/**
-				 * Start offset.
-				 */
-				uint32 StartOffset;
-			};
+	/**
+	 * Shape image format.
+	 */
+	enum class ShapeImageType : byte {
+		Unknown,
 
-		
-			/**
-			 * Shape image format.
-			 */
-			enum class ShpsImageType : byte {
-				Unknown,
+		// 4bpp image
+		Lut128 = 0x1,
 
-				// 4bpp image
-				Lut128 = 0x1,
+		// 256 color image
+		Lut256 = 0x02,
 
-				// 256 color image
-				Lut256 = 0x02,
-
-				// 32bpp BGRA, no LUT
-				NonLut32Bpp = 0x05
-			};
-			
-			// this is probably a byte like ImageType
-			enum EncodingType : uint32 {
-				None,
-				Interleaved = 0x00200000,
-				Unknown
-			};
-
-			/**
-			 * Shape file per-shape header.
-			 */
-			struct ImageHeader {
-
-				/**
-				 * Shape format.
-				 */
-				ShpsImageType format;
-
-				/**
-				 * Offset to the start of the CLUT header.
-				 */
-				uint24le clut_offset;
-
-				uint16 width;
-
-				uint16 height;
+		// 32bpp BGRA, no LUT
+		NonLut32Bpp = 0x05
+	};
 
 
-				// TODO: these are bit fields too(TM)
-				uint32 unknown2;
+	// this is probably a byte like ImageType
+	enum EncodingType : uint32 {
+		None,
+		Interleaved = 0x00200000,
+		Unknown
+	};
 
-				uint32 unknown3;
+	/**
+	 * Shape file per-shape header.
+	 */
+	struct ImageHeader {
+		/**
+		 * Shape format.
+		 */
+		ShapeImageType format;
 
-				// image data starts after this
-			};
+		/**
+		 * Offset to the start of the CLUT header.
+		 */
+		uint24le clut_offset;
 
-			/**
-			 * Shape file LUT header
-			 */
-			struct PaletteHeader {
-				// This is mostly used as a marker.
-				// TODO
-				char unknown[4];
+		uint16 width;
 
-				// Is this even used?
-				// Not sure
-				uint16 colorCount;
+		uint16 height;
 
-				uint16 unknown2;
+		// TODO: these are bit fields too(TM)
+		uint32 unknown2;
 
-				uint32 unknown3;
+		uint32 unknown3;
 
-				uint32 unknown4;
+		// image data starts after this
+	};
 
-				// palette data as a array of bgra8888
-			};
+	/**
+	 * Shape file LUT header
+	 */
+	struct PaletteHeader {
+		// This is mostly used as a marker.
+		// TODO
+		char unknown[4];
 
-			/**
-			 * 4-byte RGBA color, in BGRA order
-			 */
-			union Bgra8888 {
-				/**
-				 * total value
-				 */
-				uint32 total;
+		// Is this even used?
+		// Not sure
+		uint16 colorCount;
 
-				/**
-				 * Struct accessor for accessing individual components of the color
-				 */
-				struct {
-					byte b;
+		uint16 unknown2;
 
-					byte g;
+		uint32 unknown3;
 
-					byte r;
+		uint32 unknown4;
 
-					byte a;
-				};
-			};
+		// palette data as a array of bgra8888
+	};
 
-			/**
-			 * EAGLE-specific extension structure to hold image data as well
-			 */
-			struct Image : public shps::ImageHeader {
-				/**
-				 * The TOC entry this image is under.
-				 */
-				shps::TocEntry toc_entry;
+	/**
+	 * 4-byte RGBA color, in BGRA order
+	 */
+	union Bgra8888 {
+		/**
+		 * total value
+		 */
+		uint32 total;
 
-				// this is a huge hack, remove it
-				/**
-				 * Image index
-				 */
-				int index;
+		/**
+		 * Struct accessor for accessing individual components of the color
+		 */
+		struct {
+			byte b;
 
-				/**
-				 * The image data.
-				 *
-				 * Under LUT256 and LUT128, this will contain indexes suitable for the palette array.
-				 */
-				std::vector<byte> data;
+			byte g;
 
-				/**
-				 * Palette used if this image is palettized.
-				 */
-				std::vector<shps::Bgra8888> palette;
+			byte r;
 
-				// TODO: std::optional<>?
-				/**
-				 * Full image name.
-				 */
-				std::string FullName;
-			};
+			byte a;
+		};
+	};
 
-		} // namespace shps
-	}	  // namespace core
-} // namespace eagle
+	/**
+	 * EAGLE-specific extension structure to hold image data as well
+	 */
+	struct Image : public shps::ImageHeader {
+		/**
+		 * The TOC entry this image is under.
+		 */
+		shps::TocEntry toc_entry;
+
+		// this is a huge hack, remove it
+		/**
+		 * Image index
+		 */
+		int index;
+
+		/**
+		 * The image data.
+		 *
+		 * Under LUT256 and LUT128, this will contain indexes suitable for the palette array.
+		 */
+		std::vector<byte> data;
+
+		/**
+		 * Palette used if this image is palettized.
+		 */
+		std::vector<shps::Bgra8888> palette;
+
+		// TODO: std::optional<>?
+		/**
+		 * Full image name.
+		 */
+		std::string FullName;
+
+		// TODO: extension functions
+	};
+
+} // namespace eagle::core::shps
+
+namespace eagle::core {
+
+	/**
+	 * Specialization of EnumToString for ShapeImageType
+	 */
+	template<>
+	constexpr const char* EnumToString<shps::ShapeImageType>(shps::ShapeImageType type) {
+		switch(type) {
+			case shps::ShapeImageType::Lut128:
+				return "4bpp";
+				break;
+			case shps::ShapeImageType::Lut256:
+				return "8bpp";
+				break;
+			case shps::ShapeImageType::NonLut32Bpp:
+				return "32bpp";
+				break;
+			default:
+				return "Unknown";
+				break;
+		}
+	}
+
+}
