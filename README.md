@@ -34,6 +34,8 @@ make -j3
 
 On Windows you can also use Visual Studio's CMake tools.
 
+On Linux building for windows can be donw with the build-mingw.sh script.
+
 ## Running
 
 ### CLI
