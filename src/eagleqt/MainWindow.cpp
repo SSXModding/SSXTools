@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 
+#include "AboutUi.h"
+
 #include <QToolTip>
 #include <QScrollBar>
 #include <QTextStream>
@@ -21,8 +23,8 @@ namespace eagle::ui {
 		connect(ui.openSSH, &QAction::triggered, this, &MainWindow::OnOpenSSH);
 
 		connect(ui.aboutEagle, &QAction::triggered, [&]() {
-			// TODO: Needs to be stateful in MainWindow.
-			QMessageBox::information(this, "About EAGLe", "EAGLe Qt 5 Frontend. TODO: Stateful window widget.");
+			auto* dialog = new AboutUi(this);
+			dialog->show();
 		});
 
 		connect(ui.aboutQt, &QAction::triggered, []() {

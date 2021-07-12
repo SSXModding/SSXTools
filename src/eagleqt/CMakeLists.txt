@@ -7,6 +7,9 @@ find_package(Qt5 COMPONENTS Widgets REQUIRED)
 set(EAGLE_UI_SOURCES
 	main.cpp
 
+	AboutUi.h
+	AboutUi.cpp
+
 	MainWindow.h
 	MainWindow.cpp
 
@@ -15,6 +18,7 @@ set(EAGLE_UI_SOURCES
 	# QT/win32 things
 	eagle.qrc
 	MainWindow.ui
+	AboutUi.ui
 	eagle.rc
 )
 
