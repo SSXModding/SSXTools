@@ -29,7 +29,7 @@ namespace eagle::core {
 		 * \param[in] imageBuffer Image buffer to write to.
 		 * \param[in] image SHPS image to write
 		 */
-		bool BuildImageBuffer(std::vector<byte>& imageBuffer, shps::Image& image);
+		bool BuildImageBuffer(std::vector<byte>& imageBuffer, shps::Image& image, bool ssxHack = false);
 
 		/**
 		 * Write the provided SHPS image to a PNG file.

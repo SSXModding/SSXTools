@@ -4,11 +4,11 @@
 
 namespace eagle::ui {
 
-	void ShapeWidget::PaintShape(core::shps::Image& shape) {
+	void ShapeWidget::PaintShape(core::shps::Image& shape, bool ssxHack) {
 		core::ShpsConverter writer;
 
 		// Build the raw RGBA8888 image buffer.
-		if(!writer.BuildImageBuffer(rawBuffer, shape))
+		if(!writer.BuildImageBuffer(rawBuffer, shape, ssxHack))
 			return;
 
 		// Feed it into the QImage constructor designed for dealing with raw data

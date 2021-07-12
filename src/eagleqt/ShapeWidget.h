@@ -31,7 +31,7 @@ namespace eagle::ui {
 		 *
 		 * \param[in] shape The shape image to load and display.
 		 */
-		void PaintShape(core::shps::Image& shape);
+		void PaintShape(core::shps::Image& shape, bool ssxHack);
 
 		//inline QSize sizeHint() const override {
 		//	std::printf("fuck you: %d x %d\n", qtImage.width(), qtImage.height());

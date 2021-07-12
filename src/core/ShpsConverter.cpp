@@ -74,13 +74,13 @@ namespace eagle::core {
 			return test(MaxColor.a);
 		}
 
-		bool ShpsConverter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image) {
+		bool ShpsConverter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image, bool ssxHack) {
 			if(image.data.empty()) {
 				//logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
 			}
 
-			bool ssxHack = ShouldEnableSSXHack(image);
+			//bool ssxHack = ShouldEnableSSXHack(image);
 
 			//if(ssxHack)
 			//	logger.info("Enabling FIXSSH.BAT hack cause alpha was <= 128");

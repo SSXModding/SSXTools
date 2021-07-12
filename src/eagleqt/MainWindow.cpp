@@ -122,7 +122,7 @@ namespace eagle::ui {
 		statusBar()->showMessage(message);
 
 		if(shape_widget_)
-			shape_widget_->PaintShape(shape);
+			shape_widget_->PaintShape(shape, ui.actionEnableSSXHack->isChecked());
 	}
 
 } // namespace eagle::ui
