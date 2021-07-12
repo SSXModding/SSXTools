@@ -12,10 +12,9 @@ namespace eagle::core {
 
 	/**
 	 * Template function to read palette so I don't repeat myself as much
-	 * Hopefully this gets turned into distinct functions..?
 	 * \tparam N amount of colors to read
 	 */
-	template<int N>
+	template<uint16 N>
 	constexpr void ReadPalette(std::vector<shps::Bgra8888>& palette, mco::BinaryReader& reader) {
 		palette.resize(N);
 
@@ -24,7 +23,7 @@ namespace eagle::core {
 	}
 
 	bool ShpsReader::CheckValidHeader(const shps::FileHeader& header) {
-		if(SizedCmp(header.Magic, "SHPS")) { // TODO: Investigate having this NOT be a string comparision
+		if(EndianSwap(header.Magic) == MakeFourCCValue("SHPS")) {
 			auto length = [&]() {
 				auto oldpos = reader.raw().tellg();
 				reader.raw().seekg(0, std::istream::end);
@@ -68,8 +67,7 @@ namespace eagle::core {
 
 		shps::TocEntry& tocEntry = toc[imageIndex];
 
-		// whether or not we should bother reading the
-		// CLUT
+		// whether or not we should bother reading the CLUT
 		bool readclut = false;
 		shps::Image image;
 
@@ -88,7 +86,7 @@ namespace eagle::core {
 		reader.ReadSingleType<shps::ImageHeader>(image);
 
 		// fix the format of refpack shapes
-		// This is a hack and I really should be masking out 0xn0,
+		// This is a hack and I really should be testing out bits,
 		// but this should work for right now.
 		// If this ends up requiring more I'll fix it.
 
@@ -189,6 +187,7 @@ namespace eagle::core {
 
 				image.palette = palette_copy;
 			}
+
 		}
 
 		// Add the image now that we've got its data.

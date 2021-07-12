@@ -23,7 +23,7 @@ namespace eagle::core::shps {
 	 */
 	struct FileHeader {
 		// File magic (SHPS)
-		char Magic[4];
+		uint32 Magic;
 
 		/**
 		 * Size of the entire shape file in bytes.
@@ -76,7 +76,6 @@ namespace eagle::core::shps {
 		// 32bpp BGRA, no LUT
 		NonLut32Bpp = 0x05
 	};
-
 
 	// this is probably a byte like ImageType
 	enum EncodingType : uint32 {
@@ -203,17 +202,16 @@ namespace eagle::core {
 		switch(type) {
 			case shps::ShapeImageType::Lut128:
 				return "4bpp";
-				break;
+
 			case shps::ShapeImageType::Lut256:
 				return "8bpp";
-				break;
+
 			case shps::ShapeImageType::NonLut32Bpp:
 				return "32bpp";
-				break;
+
 			default:
 				return "Unknown";
-				break;
 		}
 	}
 
-}
+} // namespace eagle::core

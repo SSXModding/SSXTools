@@ -152,10 +152,6 @@ namespace eagle::core {
 
 					// We cast the image data (which is just individual bytes) to Bgra8888* because
 					// non-LUT images directly use Bgra8888.
-					//
-					// Also saves a bit of typing, as we won't have to manually
-					// advance 4 bytes and cast to Bgra8888* each and every time.
-					// We can just increment the pointer!
 					auto* texPixelPtr = (shps::Bgra8888*)image.data.data();
 
 					// Write each pixel to the image buffer that we save.

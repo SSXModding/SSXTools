@@ -9,15 +9,23 @@
 
 #include <QWidget>
 #include <QImage>
+#include <QLayout>
 
 namespace eagle::ui {
 
 	/**
-	 * Widget for displaying shape images.
+	 * Widget for displaying a shape's images.
 	 */
 	struct ShapeWidget : public QWidget {
 		Q_OBJECT
 	   public:
+
+		ShapeWidget(QWidget* parent, QLayout* layout)
+		 : QWidget(parent) {
+			this->layout = layout;
+			this->layout->addWidget(this);
+		}
+
 		/**
 		 * Display a shape image.
 		 *
@@ -25,11 +33,25 @@ namespace eagle::ui {
 		 */
 		void PaintShape(core::shps::Image& shape);
 
+		//inline QSize sizeHint() const override {
+		//	std::printf("fuck you: %d x %d\n", qtImage.width(), qtImage.height());
+		//	return QSize{qtImage.width() + 16, qtImage.height() + 16};
+		//}
+
+		//inline QSize minimumSizeHint() const override {
+		//	return QSize{qtImage.width() , qtImage.height()};
+		//}
+
 	   protected:
 		void paintEvent(QPaintEvent*);
 
 	   private:
 		QImage qtImage;
+		QLayout* layout;
+		/**
+		 * The backing raw buffer for the qt image.
+		 */
+		std::vector<mco::byte> rawBuffer;
 		//core::shps::Image* painting_shape = nullptr;
 	};
 

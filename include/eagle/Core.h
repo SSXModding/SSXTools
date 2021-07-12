@@ -111,11 +111,11 @@ namespace eagle::core {
 
 	/**
 	 * Turn a enum constant into a string.
-	 * Needs to be specialized.
+	 * Needs to be specialized for each enum.
 	 */
 	template<class T>
 	constexpr const char* EnumToString(T) {
-		//static_assert(false, "EnumToString not specialized for type T!");
+		// TODO: this should be static_assert'd at compile time
 		return "no";
 	}
 

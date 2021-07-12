@@ -68,7 +68,7 @@ namespace eagle::core {
 		};
 
 		// sanity checks
-		static_assert(sizeof(basic_uint24<false>) == 3, "Your compiler sucks and basic_uint24<> somehow isn't 3 bytes on it, get a better one");
+		static_assert(sizeof(basic_uint24<false>) == 3, "Your compiler sucks and basic_uint24<> somehow isn't 3 bytes on it. Get a better one");
 	} // namespace detail
 
 	// uint24 types
