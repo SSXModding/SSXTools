@@ -139,7 +139,7 @@ namespace eagle::core {
 			reader.ReadSingleType(ph);
 
 			// ALL palettized shapes have a CLUT header with this magic value (ascii '!') being the first byte.
-			// So, if this isn't pressent, then we just return a empty shape and presume it's invalid.
+			// So if this isn't present, then we just return a empty shape and presume it's invalid.
 			if(ph.unknown[0] != 0x21) {
 				error();
 				//images.push_back(image);
@@ -168,6 +168,7 @@ namespace eagle::core {
 					   || EndianSwap(header.creator) == shps::GimexVersion_SSXT);
 			};
 
+			// SSX3 shape images with a CLUT tile the colors for some reason.
 			if(IsSSX3Shape() && image.format == shps::ShapeImageType::Lut256) {
 				std::vector<shps::Bgra8888> palette_copy { image.palette.size() };
 				constexpr int tile_x = 8;

@@ -22,7 +22,7 @@ namespace eagle::ui {
 
 		connect(ui.aboutEagle, &QAction::triggered, [&]() {
 			// TODO: Needs to be stateful in MainWindow.
-			QMessageBox::information(this, "About EAGLe", "EAGLE Qt 5 Frontend. TODO: Stateful window widget.");
+			QMessageBox::information(this, "About EAGLe", "EAGLe Qt 5 Frontend. TODO: Stateful window widget.");
 		});
 
 		connect(ui.aboutQt, &QAction::triggered, []() {

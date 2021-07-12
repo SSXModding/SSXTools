@@ -4,7 +4,7 @@
 #include <eagle/Core.h>
 
 // TODO: Switch to a real libpng
-//
+//  (this will probably be provided by the Qt GUI, as eagle-cli was always sort of a test.)
 #include "stb_image_write.h"
 
 using namespace eagle::core;
@@ -74,9 +74,6 @@ namespace eagle::core {
 			return test(MaxColor.a);
 		}
 
-		// Constant amount of channels in the output PNG.
-		constexpr int32 CHANNEL_COUNT = 4;
-
 		bool ShpsConverter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image) {
 			if(image.data.empty()) {
 				//logger.error("Image ", image.index, " is empty or unknown format!");
@@ -93,7 +90,7 @@ namespace eagle::core {
 			//logger.info("Information on image ", image.index, ':');
 			//logger.info("Width x Height: ", image.width, 'x', image.height);
 
-			imageBuffer.resize((image.width * image.height * CHANNEL_COUNT));
+			imageBuffer.resize((image.width * image.height * ShpsConverter::ChannelCount));
 
 			switch(image.format) {
 				case shps::ShapeImageType::Lut128: {
@@ -199,7 +196,7 @@ namespace eagle::core {
 
 
 			// Finally, write the PNG after we've made the data buffers.
-			stbi_write_png(outFilename.c_str(), image.width, image.height, CHANNEL_COUNT, imageData.data(), (image.width * CHANNEL_COUNT));
+			stbi_write_png(outFilename.c_str(), image.width, image.height, ShpsConverter::ChannelCount, imageData.data(), (image.width * ShpsConverter::ChannelCount));
 			logger.info("Image ", image.index, " (" , EnumToString(image.format), ")", " written to \"", outFilename, "\".");
 
 			// Clear the PNG data buffer after we're done.

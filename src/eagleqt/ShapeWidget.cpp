@@ -11,22 +11,11 @@ namespace eagle::ui {
 		if(!writer.BuildImageBuffer(rawBuffer, shape))
 			return;
 
-		// Feed it into the QImage constructor designed for this.
+		// Feed it into the QImage constructor designed for dealing with raw data
+		// (since ShpsConverter::BuildImageBuffer creates *standardized* RGBA8888 data).
 		qtImage = QImage(rawBuffer.data(), shape.width, shape.height, QImage::Format_RGBA8888, nullptr, nullptr);
 
-		/*
-		auto* ptr = reinterpret_cast<eagle::core::shps::Bgra8888*>(rawBuffer.data());
-		qtImage = QImage(shape.width, shape.height, QImage::Format_RGBA8888);
-
-		for(int x = 0; x < shape.width; ++x) {
-			for(int y = 0; y < shape.height; ++y) {
-				const auto& shapecolor = ptr[y * shape.width + x];
-				qtImage.setPixel(x, y, qRgba(shapecolor.b, shapecolor.g, shapecolor.r, shapecolor.a));
-			}
-		}
-		*/
-
-		// Resize and queue a update of the widget.
+		// Resize and queue a update of the widget for the shape's size.
 		QWidget::resize(shape.width, shape.height);
 		QWidget::update();
 	}

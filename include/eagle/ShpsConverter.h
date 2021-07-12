@@ -18,6 +18,11 @@ namespace eagle::core {
 	 */
 	struct ShpsConverter {
 		/**
+		 * How many channels are in the final image buffer.
+		 */
+		constexpr static byte ChannelCount = 4;
+
+		/**
 		 * Builds a normal 32bpp RGBA image from a SHPS image.
 		 * Returns false on failure/invalid format, true otherwise.
 		 *
@@ -26,9 +31,10 @@ namespace eagle::core {
 		 */
 		bool BuildImageBuffer(std::vector<byte>& imageBuffer, shps::Image& image);
 
-		// TODO: seperate ShpsPNGWriter class, please!
 		/**
 		 * Write the provided SHPS image to a PNG file.
+		 * This method will probably be removed soon as it's only purpose was basically
+		 * for testing.
 		 *
 		 * Returns false on failure (progress function will output a possible reason),
 		 * or true on successful image write..

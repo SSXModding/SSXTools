@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>EAGLe User Interface</string>
+   <string>EAGLe</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QFormLayout" name="formLayout">
@@ -90,7 +90,13 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Open .SSH</string>
+    <string>Open .&amp;SSH</string>
+   </property>
+   <property name="toolTip">
+    <string>Open a .SSH file for preview.</string>
+   </property>
+   <property name="shortcut">
+    <string>S</string>
    </property>
   </action>
   <action name="actionBIGF">

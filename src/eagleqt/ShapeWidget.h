@@ -14,7 +14,7 @@
 namespace eagle::ui {
 
 	/**
-	 * Widget for displaying a shape's images.
+	 * Widget for displaying a shape's image onto some preview area.
 	 */
 	struct ShapeWidget : public QWidget {
 		Q_OBJECT
