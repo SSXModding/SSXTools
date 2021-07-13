@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>990</width>
-    <height>565</height>
+    <width>1000</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>EAGLe</string>
+   <string>SSXTools GUI</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QFormLayout" name="formLayout">
@@ -64,7 +64,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>990</width>
+     <width>1000</width>
      <height>20</height>
     </rect>
    </property>
@@ -78,7 +78,7 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="aboutEagle"/>
+    <addaction name="aboutSSXTools"/>
     <addaction name="aboutQt"/>
    </widget>
    <widget class="QMenu" name="menuOptions">
@@ -116,9 +116,9 @@
     <string>BIG4/C0FB (RefPack)</string>
    </property>
   </action>
-  <action name="aboutEagle">
+  <action name="aboutSSXTools">
    <property name="text">
-    <string>About EAGLe</string>
+    <string>About SSXTools</string>
    </property>
   </action>
   <action name="openBig">
@@ -142,7 +142,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Enable SSX Mult Hack</string>
+    <string>Enable SSX Mult hack (SSH)</string>
    </property>
    <property name="toolTip">
     <string>Enables a hack multiplying RGB values which seems to only be needed for SSX.</string>

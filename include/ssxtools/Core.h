@@ -10,7 +10,7 @@
 #include <modeco/types.h>
 #include <modeco/span.h>
 
-namespace eagle::core {
+namespace ssxtools::core {
 
 #if defined(__GNUC__) || defined(__clang__)
 	#define EAGLE_UNUSED __attribute__((unused))
@@ -20,6 +20,7 @@ namespace eagle::core {
 	#define EAGLE_UNUSED
 #endif
 
+	// TODO: Go away from using mcommon, and possibly integrate bigfile sources into
 	using mco::byte;
 	using mco::sbyte;
 
@@ -123,4 +124,4 @@ namespace eagle::core {
 	 * }@
 	 */
 
-} // namespace eagle::core
+} // namespace ssxtools::shps

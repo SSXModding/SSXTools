@@ -1,22 +1,20 @@
 #include <vector>
 #include <sstream>
-#include <eagle/ShpsConverter.h>
-#include <eagle/Core.h>
+#include <ssxtools/shps/ShpsConverter.h>
+#include <ssxtools/Core.h>
 
 // TODO: Switch to a real libpng
-//  (this will probably be provided by the Qt GUI, as eagle-cli was always sort of a test.)
+//  (this will probably be provided by the Qt GUI, as ssxtools-cli was always sort of a test.)
 #include "stb_image_write.h"
 
-using namespace eagle::core;
-
-namespace eagle::core {
+namespace ssxtools::shps {
 
 		/**
 		 * Multiply a stored byte.
 		 *
 		 * \param[in] val val.
 		 */
-		inline byte MultiplyValue(byte val) {
+		inline core::byte MultiplyValue(core::byte val) {
 			// Multiply the stored value by 2
 			// or round it directly up to 255 if it's 128.
 			// We do this instead of blindly multiplying the value
@@ -42,8 +40,8 @@ namespace eagle::core {
 		 */
 		bool ShouldEnableSSXHack(shps::Image& image) {
 			// test
-			auto test = [](byte c) {
-				return c != 255 && c != 0 /* Seems to fix some other textures */ && std::max(c, (byte)128) == 128;
+			auto test = [](core::byte c) {
+				return c != 255 && c != 0 /* Seems to fix some other textures */ && std::max(c, (core::byte)128) == 128;
 			};
 
 			shps::Bgra8888 MaxColor{};
@@ -54,13 +52,13 @@ namespace eagle::core {
 				// This will be far slower than if we had a palette,
 				// but it's the only way we can determine it on 32bpp images.
 
-				MaxColor = MaxSpanElement(mco::MakeSpan((shps::Bgra8888*)image.data.data(), image.width * image.height), [](const shps::Bgra8888& l, const shps::Bgra8888& r) {
+				MaxColor = core::MaxSpanElement(mco::MakeSpan((Bgra8888*)image.data.data(), image.width * image.height), [](const Bgra8888& l, const Bgra8888& r) {
 					return std::max(l.r, r.r) && std::max(l.g, r.g) && std::max(l.b, r.b) && std::max(l.a, r.a);
 				});
 			} else {
 				// Use a faster method that just gets the max palette.
 
-				MaxColor = MaxSpanElement(mco::MakeSpan(image.palette.data(), image.palette.size()), [](const shps::Bgra8888& l, const shps::Bgra8888& r) {
+				MaxColor = core::MaxSpanElement(mco::MakeSpan(image.palette.data(), image.palette.size()), [](const Bgra8888& l, const Bgra8888& r) {
 					return std::max(l.r, r.r) && std::max(l.g, r.g) && std::max(l.b, r.b) && std::max(l.a, r.a);
 				});
 
@@ -74,7 +72,7 @@ namespace eagle::core {
 			return test(MaxColor.a);
 		}
 
-		bool ShpsConverter::BuildImageBuffer(std::vector<byte>& imageBuffer, core::shps::Image& image, bool ssxHack) {
+		bool ShpsConverter::BuildImageBuffer(std::vector<core::byte>& imageBuffer, Image& image, bool ssxHack) {
 			if(image.data.empty()) {
 				//logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
@@ -93,10 +91,10 @@ namespace eagle::core {
 			imageBuffer.resize((image.width * image.height * ShpsConverter::ChannelCount));
 
 			switch(image.format) {
-				case shps::ShapeImageType::Lut128: {
+				case ShapeImageType::Lut128: {
 					//logger.info("Image ", image.index, " is an 4bpp image.");
-					byte* normalizedDataPtr = imageBuffer.data();
-					byte* texPixelPtr = image.data.data();
+					core::byte* normalizedDataPtr = imageBuffer.data();
+					core::byte* texPixelPtr = image.data.data();
 
 					// Write each pixel to the image buffer that we save.
 					// We do this by looking in the LUT for each pixel and setting the colors there.
@@ -116,12 +114,12 @@ namespace eagle::core {
 					}
 				} break;
 
-				case shps::ShapeImageType::Lut256: {
+				case ShapeImageType::Lut256: {
 					//logger.info("Image ", image.index, " is an 8bpp image.");
-					byte* normalizedDataPtr = imageBuffer.data();
+					core::byte* normalizedDataPtr = imageBuffer.data();
 
 					// Current pixel.
-					byte* texPixelPtr = image.data.data();
+					core::byte* texPixelPtr = image.data.data();
 
 					// Write each pixel to the image buffer that we save.
 					// We do this by looking in the LUT for each pixel and setting the colors there.
@@ -142,14 +140,14 @@ namespace eagle::core {
 					}
 				} break;
 
-				case shps::ShapeImageType::NonLut32Bpp: {
+				case ShapeImageType::NonLut32Bpp: {
 					//logger.info("Image ", image.index, " is an 32bpp image.");
 
-					byte* normalizedDataPtr = imageBuffer.data();
+					core::byte* normalizedDataPtr = imageBuffer.data();
 
 					// We cast the image data (which is just individual bytes) to Bgra8888* because
 					// non-LUT images directly use Bgra8888.
-					auto* texPixelPtr = (shps::Bgra8888*)image.data.data();
+					auto* texPixelPtr = (Bgra8888*)image.data.data();
 
 					// Write each pixel to the image buffer that we save.
 					for(int i = 0; i < image.width * image.height; ++i) {
@@ -175,7 +173,9 @@ namespace eagle::core {
 			return true;
 		}
 
-		bool ShpsConverter::WritePNG(core::shps::Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
+		// dead code ATM
+
+		bool ShpsConverter::WritePNG(Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path) {
 			// avoid weird images entirely,
 			// helps avoid crashing on certain things
 			if(image.data.empty()) {
@@ -187,17 +187,16 @@ namespace eagle::core {
 			std::filesystem::create_directories(path);
 			std::string outFilename = (path / std::filesystem::path(std::to_string(image.index)).replace_extension(".PNG")).string();
 
-			std::vector<byte> imageData;
+			std::vector<core::byte> imageData;
 
 			// build image buffer
 			if(!BuildImageBuffer(imageData, image)) {
 				logger.error("Could not build image buffer...");
 			}
 
-
 			// Finally, write the PNG after we've made the data buffers.
 			stbi_write_png(outFilename.c_str(), image.width, image.height, ShpsConverter::ChannelCount, imageData.data(), (image.width * ShpsConverter::ChannelCount));
-			logger.info("Image ", image.index, " (" , EnumToString(image.format), ")", " written to \"", outFilename, "\".");
+			logger.info("Image ", image.index, " (" , core::EnumToString(image.format), ")", " written to \"", outFilename, "\".");
 
 			// Clear the PNG data buffer after we're done.
 			imageData.clear();
@@ -205,4 +204,4 @@ namespace eagle::core {
 			return true;
 		}
 
-	} // namespace eagle
+	} // namespace ssxtools

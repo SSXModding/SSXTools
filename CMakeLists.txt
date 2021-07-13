@@ -1,19 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
-project(EAGLe CXX)
+project(SSXTools CXX)
 
 include(CheckCXXSourceCompiles)
 find_package(Threads)
 
-# EAGLe is made up of two seperate components
-#
-# Core - The core library that handles formats
-#
-# eagle-cli - The EAGLe CLI interface.
-#
-#
-# This option is provided for other projects to allow importing SHPSCore without also importing the EAGLE UI projects (and causing clutter).
-option(EAGLE_SHPSCORE_ONLY "Turn this option on if you want to use SHPSCore in your projects" OFF)
-option(EAGLE_DISABLE_QT "Disable building the QT graphical user interface of EAGLe" OFF)
+option(SSXTOOLS_DISABLE_QT "Disable building the graphical user interface of SSXTools" OFF)
 
 
 if(MSVC)
@@ -21,7 +12,7 @@ if(MSVC)
 endif()
 
 # Detect the particular C++ standard library if it's not cached.
-if(NOT DEFINED CACHE{EAGLE_STDLIB})
+if(NOT DEFINED CACHE{SSXTOOLS_STDLIB})
 	message(STATUS "Detecting C++ standard library")
 	set(CMAKE_REQUIRED_QUIET ON)
 
@@ -59,7 +50,7 @@ if(NOT DEFINED CACHE{EAGLE_STDLIB})
 		message(FATAL_ERROR "Can't find which C++ runtime is in use")
 	endif()
 
-	set(EAGLE_STDLIB ${STANDARD_LIBRARY} CACHE STRING "The C++ standard library in use; possible values: libstdc++, libc++, msvc")
+	set(SSXTOOLS_STDLIB ${STANDARD_LIBRARY} CACHE STRING "The C++ standard library in use; possible values: libstdc++, libc++, msvc")
 
 	message(STATUS "Detected ${EAGLE_STDLIB}")
 endif()
@@ -70,11 +61,9 @@ add_subdirectory(vendor/bigfile)
 set(MCOMMON_DO_NOT_INSTALL ON)
 add_subdirectory(vendor/mcommon)
 
-add_subdirectory(src/core)
+add_subdirectory(src/shps)
 
-if(NOT EAGLE_SHPSCORE_ONLY)
-	add_subdirectory(src/eaglecli)
-	if(NOT EAGLE_DISABLE_QT)
-		add_subdirectory(src/eagleqt)
-	endif()
+
+if(NOT SSXTOOLS_DISABLE_QT)
+	add_subdirectory(src/gui)
 endif()

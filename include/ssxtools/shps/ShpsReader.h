@@ -3,10 +3,10 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <eagle/ShpsStructs.h>
+#include <ssxtools/shps/ShpsStructs.h>
 #include <modeco/BinaryReader.h>
 
-namespace eagle::core {
+namespace ssxtools::shps {
 
 	/**
 	 * Reads SHPS (.ssh) texture banks to data structures that can be serialized
@@ -35,26 +35,26 @@ namespace eagle::core {
 		 *
 		 * \param[in] header File header to check.
 		 */
-		bool CheckValidHeader(const shps::FileHeader& header);
+		bool CheckValidHeader(const FileHeader& header);
 
 		/**
 		 * Read a image at the provided TOC index.
 		 *
 		 * \param[in] index Index to read.
 		 */
-		shps::Image ReadImage(int imageIndex);
+		Image ReadImage(int imageIndex);
 
 		/**
 		 * Get the file header.
 		 */
-		inline shps::FileHeader& GetHeader() {
+		inline FileHeader& GetHeader() {
 			return header;
 		}
 
 		/**
 		 * Get the image TOC.
 		 */
-		inline std::vector<shps::TocEntry>& GetTOC() {
+		inline std::vector<TocEntry>& GetTOC() {
 			return toc;
 		}
 
@@ -68,7 +68,7 @@ namespace eagle::core {
 		/**
 		 * Get all images.
 		 */
-		std::vector<shps::Image>& GetImages() {
+		std::vector<Image>& GetImages() {
 			return images;
 		}
 
@@ -86,8 +86,8 @@ namespace eagle::core {
 
 		// Image stuff
 		shps::FileHeader header {};
-		std::vector<shps::TocEntry> toc;
-		std::vector<shps::Image> images;
+		std::vector<TocEntry> toc;
+		std::vector<Image> images;
 	};
 
-} // namespace eagle::core
+} // namespace ssxtools::shps

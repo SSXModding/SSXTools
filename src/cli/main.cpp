@@ -7,10 +7,10 @@
 #include <modeco/Logger.h>
 #include <modeco/IostreamLoggerSink.h>
 
-#include <eagle/ShpsReader.h>
-#include <eagle/ShpsConverter.h>
+#include <ssxtools/shps/ShpsReader.h>
+#include <ssxtools/shps/ShpsConverter.h>
 
-using namespace eagle::core;
+using namespace ssxtools::core;
 
 /**
  * CLI version and usage information.
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 	logger.info("  Total File Size:", (float)header.FileLength / 1000, " kB");
 	logger.info("  Image Count:", header.FileTextureCount, " files");
 
-	// Read every image into the ShpsReader/core format
+	// Read every image into the ShpsReader/shps format
 	for(uint32 i = 0; i < header.FileTextureCount; ++i)
 		reader.ReadImage(i);
 

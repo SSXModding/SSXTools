@@ -26,7 +26,7 @@
 	#error Unsupported compiler.
 #endif
 
-namespace eagle::core {
+namespace ssxtools::core {
 
 	/**
 	 * Swap the endian of a provided value.
@@ -56,7 +56,7 @@ namespace eagle::core {
 		}
 	}
 
-} // namespace eagle::core
+} // namespace ssxtools::shps
 
 #undef BYTESWAP16
 #undef BYTESWAP32

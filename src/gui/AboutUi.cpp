@@ -4,7 +4,7 @@
 
 #include "AboutUi.h"
 
-namespace eagle::ui {
+namespace ssxtools::ui {
 
 	AboutUi::AboutUi(QWidget* parent)
 		: QDialog(parent) {
@@ -15,4 +15,4 @@ namespace eagle::ui {
 		});
 	}
 
-} // namespace eagle::ui
+} // namespace ssxtools::ui

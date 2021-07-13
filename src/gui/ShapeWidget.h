@@ -1,17 +1,17 @@
 #pragma once
-#include <eagle/Core.h>
+#include <ssxtools/Core.h>
 
-#include <eagle/ShpsStructs.h>
+#include <ssxtools/shps/ShpsStructs.h>
 
 #define INQT
-#include <eagle/ShpsConverter.h>
+#include <ssxtools/shps/ShpsConverter.h>
 #undef INQT
 
 #include <QWidget>
 #include <QImage>
 #include <QLayout>
 
-namespace eagle::ui {
+namespace ssxtools::ui {
 
 	/**
 	 * Widget for displaying a shape's image onto some preview area.
@@ -31,7 +31,7 @@ namespace eagle::ui {
 		 *
 		 * \param[in] shape The shape image to load and display.
 		 */
-		void PaintShape(core::shps::Image& shape, bool ssxHack);
+		void PaintShape(shps::Image& shape, bool ssxHack);
 
 		//inline QSize sizeHint() const override {
 		//	std::printf("fuck you: %d x %d\n", qtImage.width(), qtImage.height());
@@ -52,7 +52,7 @@ namespace eagle::ui {
 		 * The backing raw buffer for the qt image.
 		 */
 		std::vector<mco::byte> rawBuffer;
-		//core::shps::Image* painting_shape = nullptr;
+		//shps::shps::Image* painting_shape = nullptr;
 	};
 
-} // namespace eagle::ui
+} // namespace ssxtools::ui

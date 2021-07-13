@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace eagle::core {
+namespace ssxtools::core {
 
 	namespace detail {
 
@@ -89,6 +89,6 @@ namespace eagle::core {
 	using uint24 = detail::basic_uint24<true>;
 #endif
 
-} // namespace eagle::core
+} // namespace ssxtools::shps
 
 #endif //EAGLE_UINT24_H

@@ -1,4 +1,4 @@
-// TODO: the eagle name will maybe be changing
+// TODO: the ssxtools name will maybe be changing
 
 LANGUAGE 0x0409, 0x8
 #pragma code_page(1252)
@@ -25,7 +25,7 @@ BEGIN
             VALUE "FileVersion", "1.0"
             VALUE "InternalName", "EAGLe"
             VALUE "LegalTrademarks", "Licensed under the GNU Lesser General Public License Version 3."
-            VALUE "OriginalFilename", "eagle.exe"
+            VALUE "OriginalFilename", "ssxtools.exe"
             VALUE "ProductName", "EAGLe"
             VALUE "ProductVersion", "1.0"
         END

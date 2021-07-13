@@ -2,10 +2,10 @@
 #include <QPainter>
 #include <QLayout>
 
-namespace eagle::ui {
+namespace ssxtools::ui {
 
-	void ShapeWidget::PaintShape(core::shps::Image& shape, bool ssxHack) {
-		core::ShpsConverter writer;
+	void ShapeWidget::PaintShape(shps::Image& shape, bool ssxHack) {
+		shps::ShpsConverter writer;
 
 		// Build the raw RGBA8888 image buffer.
 		if(!writer.BuildImageBuffer(rawBuffer, shape, ssxHack))
@@ -27,4 +27,4 @@ namespace eagle::ui {
 		p.drawPixmap(0, 0, QPixmap::fromImage(qtImage));
 	}
 
-} // namespace eagle::ui
+} // namespace ssxtools::ui

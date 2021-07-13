@@ -1,45 +1,45 @@
 #pragma once
 #include <cstdint>
-#include <eagle/Core.h>
-#include <eagle/uint24.h>
+#include <ssxtools/Core.h>
+#include <ssxtools/uint24.h>
 
-namespace eagle::core::shps {
+namespace ssxtools::shps {
 
 	// GIMEX versions.
 	// We'll need these for some Gimex version specific stuff
 
 	// Gimex version for SSX (2000). Doesn't seem to put a real version here
-	constexpr static uint32 GimexVersion_SSX = MakeFourCCValue("GIMX");
+	constexpr static core::uint32 GimexVersion_SSX = core::MakeFourCCValue("GIMX");
 
 	// Gimex version for SSX Tricky (2001).
-	constexpr static uint32 GimexVersion_SSXT = MakeFourCCValue("G278");
+	constexpr static core::uint32 GimexVersion_SSXT = core::MakeFourCCValue("G278");
 
 	// Gimex version for SSX 3.
-	constexpr static uint32 GimexVersion_SSX3 = MakeFourCCValue("G357");
-	constexpr static uint32 GimexVersion_SSX3Alt = MakeFourCCValue("G355"); // 091103 build
+	constexpr static core::uint32 GimexVersion_SSX3 = core::MakeFourCCValue("G357");
+	constexpr static core::uint32 GimexVersion_SSX3Alt = core::MakeFourCCValue("G355"); // 091103 build
 
 	/*
 	 * Header of Gimex shape files.
 	 */
 	struct FileHeader {
 		// File magic (SHPS)
-		uint32 Magic;
+		core::uint32 Magic;
 
 		/**
 		 * Size of the entire shape file in bytes.
 		 */
-		uint32 FileLength;
+		core::uint32 FileLength;
 
 		/**
 		 * The count of textures in this shape file
 		 */
-		uint32 FileTextureCount;
+		core::uint32 FileTextureCount;
 
 		/**
 		 * A 4-byte code of the version of Gimex
 		 * used to create the shape file.
 		 */
-		uint32 creator;
+		core::uint32 creator;
 
 		// TODO: use the array hack that gimex seems to already use?
 	};
@@ -58,13 +58,13 @@ namespace eagle::core::shps {
 		/**
 		 * Start offset.
 		 */
-		uint32 StartOffset;
+		core::uint32 StartOffset;
 	};
 
 	/**
 	 * Shape image format.
 	 */
-	enum class ShapeImageType : byte {
+	enum class ShapeImageType : core::byte {
 		Unknown,
 
 		// 4bpp image
@@ -78,7 +78,7 @@ namespace eagle::core::shps {
 	};
 
 	// this is probably a byte like ImageType
-	enum EncodingType : uint32 {
+	enum EncodingType : core::uint32 {
 		None,
 		Interleaved = 0x00200000,
 		Unknown
@@ -96,16 +96,16 @@ namespace eagle::core::shps {
 		/**
 		 * Offset to the start of the CLUT header.
 		 */
-		uint24le clut_offset;
+		core::uint24le clut_offset;
 
-		uint16 width;
+		core::uint16 width;
 
-		uint16 height;
+		core::uint16 height;
 
 		// TODO: these are bit fields too(TM)
-		uint32 unknown2;
+		core::uint32 unknown2;
 
-		uint32 unknown3;
+		core::uint32 unknown3;
 
 		// image data starts after this
 	};
@@ -120,13 +120,13 @@ namespace eagle::core::shps {
 
 		// Is this even used?
 		// Not sure
-		uint16 colorCount;
+		core::uint16 colorCount;
 
-		uint16 unknown2;
+		core::uint16 unknown2;
 
-		uint32 unknown3;
+		core::uint32 unknown3;
 
-		uint32 unknown4;
+		core::uint32 unknown4;
 
 		// palette data as a array of bgra8888
 	};
@@ -138,19 +138,19 @@ namespace eagle::core::shps {
 		/**
 		 * total value
 		 */
-		uint32 total;
+		core::uint32 total;
 
 		/**
 		 * Struct accessor for accessing individual components of the color
 		 */
 		struct {
-			byte b;
+			core::byte b;
 
-			byte g;
+			core::byte g;
 
-			byte r;
+			core::byte r;
 
-			byte a;
+			core::byte a;
 		};
 	};
 
@@ -174,7 +174,7 @@ namespace eagle::core::shps {
 		 *
 		 * Under LUT256 and LUT128, this will contain indexes suitable for the palette array.
 		 */
-		std::vector<byte> data;
+		std::vector<core::byte> data;
 
 		/**
 		 * Palette used if this image is palettized.
@@ -190,9 +190,9 @@ namespace eagle::core::shps {
 		// TODO: extension functions
 	};
 
-} // namespace eagle::core::shps
+} // namespace ssxtools::shps::shps
 
-namespace eagle::core {
+namespace ssxtools::core {
 
 	/**
 	 * Specialization of EnumToString for ShapeImageType
@@ -214,4 +214,4 @@ namespace eagle::core {
 		}
 	}
 
-} // namespace eagle::core
+} // namespace ssxtools::shps

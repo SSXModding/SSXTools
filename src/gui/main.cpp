@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 #include <QtWidgets/QApplication>
 
-using namespace eagle::ui;
+using namespace ssxtools::ui;
 
 int main(int argc, char** argv) {
 	QCoreApplication::addLibraryPath("./");

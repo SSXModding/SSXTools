@@ -1,6 +1,6 @@
 #pragma once
-#include "Core.h"
-#include "ShpsStructs.h"
+#include <ssxtools/Core.h>
+#include <ssxtools/shps/ShpsStructs.h>
 #include <string>
 #include <filesystem>
 #include <functional>
@@ -11,16 +11,16 @@
 	#undef verbose
 #endif
 
-namespace eagle::core {
+namespace ssxtools::shps {
 
 	/**
-	 * The SHPS->PNG writer component of EAGLe.
+	 * The SHPS->PNG writer component of SSXTools-shps.
 	 */
 	struct ShpsConverter {
 		/**
 		 * How many channels are in the final image buffer.
 		 */
-		constexpr static byte ChannelCount = 4;
+		constexpr static core::byte ChannelCount = 4;
 
 		/**
 		 * Builds a normal 32bpp RGBA image from a SHPS image.
@@ -29,7 +29,7 @@ namespace eagle::core {
 		 * \param[in] imageBuffer Image buffer to write to.
 		 * \param[in] image SHPS image to write
 		 */
-		bool BuildImageBuffer(std::vector<byte>& imageBuffer, shps::Image& image, bool ssxHack = false);
+		bool BuildImageBuffer(std::vector<core::byte>& imageBuffer, Image& image, bool ssxHack = false);
 
 		/**
 		 * Write the provided SHPS image to a PNG file.
@@ -43,10 +43,10 @@ namespace eagle::core {
 		 * \param[in] input_path The input path. Must contain a filename.
 		 * \param[in] output_path The output path.
 		 */
-		bool WritePNG(shps::Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path);
+		bool WritePNG(Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path);
 
 	   private:
 		mco::Logger logger = mco::Logger::CreateLogger("SHPSConverter");
 	};
 
-} // namespace eagle::core
+} // namespace ssxtools::shps

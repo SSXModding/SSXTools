@@ -1,12 +1,8 @@
-## EAGLe
+## SSXTools
 
-EAGLe is a tool for working with EAGL/Gimex formats, and (potentionally...) working with some BIG archives.
+SSXTools is my personal set of libraries for working with the SSX games, coupled with a Qt-based graphical user interface
 
-
-Currently, that means converting Gimex .SSH shape files (seen on EA Canada Playstation 2 titles) to individual .PNG files.
-
-
-It's main goals are to work well while being very small and fast at the same time.
+The project's main goals are to work well while being very small and fast at the same time.
 
 Tested games:
 
@@ -14,22 +10,19 @@ Tested games:
 - SSX Tricky (2001)
 - SSX 3 (2003)
 
-## Credits
 
-- eldrinn for making SSX3Converter
-
-## Building EAGLe
+## Building SSXTools
 
 You need to clone the repository with the --recursive flag.
 
-For building the EAGLe UI, you need to install Qt 5.
+For building the GUI, you need to install Qt 5.
 
 ```
 mkdir build
 cd build
 cmake .. <your options here, install to a prefix on Windows>
 make -j3
-(for UI on Windows/selfcontained build) make install
+(for GUI on Windows/selfcontained build) make install
 ```
 
 On Windows you can also use Visual Studio's CMake tools.
@@ -38,27 +31,11 @@ On Linux building for windows can be donw with the build-mingw.sh script.
 
 ## Running
 
-### CLI
-Simply do `path/to/eagle-cli ssh_path dump_path/` and EAGLe will do its magic!
+Run `./ssxtools` on Linux, `ssxtools.exe` on Windows
 
-### GUI
-just run the exe lol
+## Using the SSXTools libraries in your own projects
 
-## Using Core in your own projects
-
-NOTE that the Core library API will change frequently until
-a stable version...
-
-Include SHPSCore like so...
-```cmake
-set(EAGLE_SHPSCORE_ONLY ON)
-add_subdirectory(path/to/vendor/eagle)
-```
-
-and link with it like...
-```cmake
-target_link_libraries(project eagle-core)
-```
+TODO now that this will be bigger
 
 ### Checklist
 

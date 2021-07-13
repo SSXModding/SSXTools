@@ -9,7 +9,7 @@
 
 #include "ui_AboutUi.h"
 
-namespace eagle::ui {
+namespace ssxtools::ui {
 
 	/**
  	 * Simple modal about UI.
@@ -23,6 +23,6 @@ namespace eagle::ui {
 		Ui::AboutUi ui;
 	};
 
-} // namespace eagle::ui
+} // namespace ssxtools::ui
 
 #endif //EAGLE_ABOUTUI_H

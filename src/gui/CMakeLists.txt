@@ -4,7 +4,7 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-set(EAGLE_UI_SOURCES
+set(SSXTOOLS_UI_SOURCES
 	main.cpp
 
 	AboutUi.h
@@ -22,17 +22,17 @@ set(EAGLE_UI_SOURCES
 	eagle.rc
 )
 
-add_executable(eagle WIN32 ${EAGLE_UI_SOURCES})
+add_executable(ssxtools WIN32 ${SSXTOOLS_UI_SOURCES})
 
-target_include_directories(eagle PRIVATE ${PROJECT_BINARY_DIR})
+target_include_directories(ssxtools PRIVATE ${PROJECT_BINARY_DIR})
 # fixes clang screaming about microsoft include rules
-target_include_directories(eagle PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(ssxtools PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-set_property(TARGET eagle PROPERTY CXX_STANDARD 17)
-set_property(TARGET eagle PROPERTY CXX_STANDARD_REQUIRED ON)
-target_link_libraries(eagle eagle-core Qt5::Widgets)
+set_property(TARGET ssxtools PROPERTY CXX_STANDARD 20)
+set_property(TARGET ssxtools PROPERTY CXX_STANDARD_REQUIRED ON)
+target_link_libraries(ssxtools ssxtools-shps Qt5::Widgets)
 
-install(TARGETS eagle RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}")
+install(TARGETS ssxtools RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}")
 
 if(WIN32)
 # Install the Qt libraries into the installation prefix.
@@ -42,11 +42,11 @@ get_target_property(_qmake_executable Qt5::qmake IMPORTED_LOCATION)
 get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
 find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
 
-file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/temp_xb2at_path" CONTENT "$<TARGET_FILE:eagle>")
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/temp_ssxtools_path" CONTENT "$<TARGET_FILE:ssxtools>")
 
 install(CODE
 	"
-	file(READ \"${CMAKE_CURRENT_BINARY_DIR}/temp_xb2at_path\" _file)
+	file(READ \"${CMAKE_CURRENT_BINARY_DIR}/temp_ssxtools_path\" _file)
 
 	execute_process(
 		COMMAND \"${CMAKE_COMMAND}\" -E

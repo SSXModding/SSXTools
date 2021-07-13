@@ -12,7 +12,7 @@
 // (so we can have icons & stuff. A lot better as well)
 #include <QItemSelectionModel>
 
-namespace eagle::ui {
+namespace ssxtools::ui {
 
 	MainWindow::MainWindow(QWidget* parent)
 		: QMainWindow(parent),
@@ -22,7 +22,7 @@ namespace eagle::ui {
 		// connect all of the UI events to functions in here
 		connect(ui.openSSH, &QAction::triggered, this, &MainWindow::OnOpenSSH);
 
-		connect(ui.aboutEagle, &QAction::triggered, [&]() {
+		connect(ui.aboutSSXTools, &QAction::triggered, [&]() {
 			auto* dialog = new AboutUi(this);
 			dialog->show();
 		});
@@ -72,15 +72,15 @@ namespace eagle::ui {
 			DisableNag();
 
 			std::ifstream stream(file, std::ifstream::in | std::ifstream::binary);
-			core::ShpsReader reader(stream, file);
+			shps::ShpsReader reader(stream, file);
 
 			if(!stream) {
-				QMessageBox::critical(this, "EAGLe Error", "There was an error opening the given .SSH file for reading.");
+				QMessageBox::critical(this, "SSXTools Error", "There was an error opening the given .SSH file for reading.");
 				return;
 			}
 
 			if(!reader.ReadHeader()) {
-				QMessageBox::critical(this, "EAGLe Error", "There was an error reading the given .SSH file.");
+				QMessageBox::critical(this, "SSXTools Error", "There was an error reading the given .SSH file.");
 				return;
 			}
 
@@ -120,11 +120,11 @@ namespace eagle::ui {
 		// Show a message on the status bar of the image type and WxH
 		// TODO: This is Rationale for using widget based list view...
 		QString message;
-		QTextStream(&message) << eagle::core::EnumToString<eagle::core::shps::ShapeImageType>(shape.format) << " " << shape.width << 'x' << shape.height;
+		QTextStream(&message) << ssxtools::core::EnumToString<ssxtools::shps::ShapeImageType>(shape.format) << " " << shape.width << 'x' << shape.height;
 		statusBar()->showMessage(message);
 
 		if(shape_widget_)
 			shape_widget_->PaintShape(shape, ui.actionEnableSSXHack->isChecked());
 	}
 
-} // namespace eagle::ui
+} // namespace ssxtools::ui
