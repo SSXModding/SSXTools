@@ -1,1 +1,0 @@
-- should provide preview to user of texture/model
