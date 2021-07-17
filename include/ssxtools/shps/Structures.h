@@ -72,7 +72,7 @@ namespace ssxtools::shps::structures {
 		template<core::Stream Stream>
 		inline bool Transform(Stream& stream) {
 			SSXTOOLS_CATCH_ERROR(stream.Byte(reinterpret_cast<std::uint8_t&>(type)));
-			SSXTOOLS_CATCH_ERROR(stream.template TransformOther(next_chunk));
+			SSXTOOLS_CATCH_ERROR(stream.template Other(next_chunk));
 			return true;
 		}
 	};
@@ -120,7 +120,7 @@ namespace ssxtools::shps::structures {
 	struct ChunkUnion {
 		template<core::Stream Stream>
 		inline bool Transform(Stream& stream) {
-			SSXTOOLS_CATCH_ERROR(stream.template TransformOther(header));
+			SSXTOOLS_CATCH_ERROR(stream.template Other(header));
 			// if not writing, we might need to add the alignment data.
 			switch(header.type) {
 				case Chunk::Type::Image4Bpp:
@@ -175,7 +175,7 @@ namespace ssxtools::shps::structures {
 			// This placement new should only be done for reading.
 			if constexpr(Stream::IsReadStream())
 				new(&t) T();
-			SSXTOOLS_CATCH_ERROR(stream.template TransformOther(t));
+			SSXTOOLS_CATCH_ERROR(stream.template Other(t));
 		}
 
 		union {
