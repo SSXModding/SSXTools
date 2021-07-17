@@ -1,7 +1,10 @@
-#ifndef EAGLE_UINT24_H
-#define EAGLE_UINT24_H
+#ifndef SSXTOOLS_UINT24_H
+#define SSXTOOLS_UINT24_H
 
 #include <cstdint>
+
+// core::Stream concept
+#include <ssxtools/core/Stream.h>
 
 namespace ssxtools::core {
 
@@ -43,24 +46,22 @@ namespace ssxtools::core {
 				return *this;
 			}
 
-			constexpr basic_uint24& operator*(const basic_uint24& other) {
-				Set(Get() * other.Get());
-			}
+#define BASICOP(op) constexpr basic_uint24& operator op (const basic_uint24& other) { Set(Get() op other.Get()); return *this; }
+			BASICOP(+)
+			BASICOP(-)
+			BASICOP(*)
+			BASICOP(/)
 
-			constexpr basic_uint24& operator+(const basic_uint24& other) {
-				_Set(Get() + other.Get());
-			}
+			// bit manip
+			BASICOP(^)
+			BASICOP(&)
+			BASICOP(|)
+#undef BASICOP
 
-			constexpr basic_uint24& operator-(const basic_uint24& other) {
-				_Set(Get() - other.Get());
-			}
-
-			constexpr basic_uint24& operator/(const basic_uint24& other) {
-				_Set(Get() / other.Get());
-			}
-
-			constexpr basic_uint24& operator^(const basic_uint24& other) {
-				_Set(Get() ^ other.Get());
+			// TODO: Implement Transform for this properly (needed for shape chunks and c0fb)
+			template<core::Stream Stream>
+			inline bool Transform(Stream& stream) {
+				return true;
 			}
 
 			// NO TOUCHY

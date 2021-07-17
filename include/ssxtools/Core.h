@@ -1,3 +1,7 @@
+// This header will probably be phased out soon.
+// Mcommon usage is going to be removed and bigfile/makecbxs
+// will be integrated. This header's days are not long.
+
 #pragma once
 #include <iostream>
 #include <fstream>
@@ -20,7 +24,6 @@ namespace ssxtools::core {
 	#define EAGLE_UNUSED
 #endif
 
-	// TODO: Go away from using mcommon, and possibly integrate bigfile sources into
 	using mco::byte;
 	using mco::sbyte;
 

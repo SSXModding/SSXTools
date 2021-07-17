@@ -1,17 +1,9 @@
 set(SHPS_SOURCES
-		../../include/ssxtools/Core.h
-		../../include/ssxtools/EndianSwap.h
-		../../include/ssxtools/shps/ShpsReader.h
-		../../include/ssxtools/shps/ShpsConverter.h
-		ShpsReader.cpp
-		ShpsConverter.cpp
-		stbimpl.cpp
-)
+		old/ShpsReader.cpp
+		old/ShpsConverter.cpp
+		old/stbimpl.cpp)
 
 add_library(ssxtools-shps STATIC ${SHPS_SOURCES})
-
-set_property(TARGET ssxtools-shps PROPERTY CXX_STANDARD 20)
-set_property(TARGET ssxtools-shps PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_include_directories(ssxtools-shps PUBLIC ${PROJECT_SOURCE_DIR}/vendor)
 target_include_directories(ssxtools-shps PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

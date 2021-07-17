@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <ssxtools/Core.h>
-#include <ssxtools/uint24.h>
+#include <ssxtools/core/uint24.h>
 
 namespace ssxtools::shps {
 

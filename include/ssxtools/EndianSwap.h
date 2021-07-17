@@ -1,4 +1,8 @@
-#pragma once
+// Replaced by ssxtools/core/EndianUtils.h (which is far better, and a lot more ergonomic.)
+
+#ifndef SSXTOOLS_ENDIANSWAP_H
+#define SSXTOOLS_ENDIANSWAP_H
+
 #include "Core.h"
 
 #ifdef _MSC_VER
@@ -56,8 +60,9 @@ namespace ssxtools::core {
 		}
 	}
 
-} // namespace ssxtools::shps
+} // namespace ssxtools::core
 
 #undef BYTESWAP16
 #undef BYTESWAP32
 #undef BYTESWAP64
+#endif

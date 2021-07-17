@@ -33,6 +33,7 @@ namespace ssxtools::shps {
 				return pos;
 			}();
 
+			// the game doesn't verify this, however when writing we probably should.
 			if(length == header.FileLength) {
 				return true;
 			} else {

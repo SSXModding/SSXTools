@@ -2,10 +2,13 @@ cmake_minimum_required(VERSION 3.1)
 project(SSXTools CXX)
 
 include(CheckCXXSourceCompiles)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 find_package(Threads)
 
 option(SSXTOOLS_DISABLE_QT "Disable building the graphical user interface of SSXTools" OFF)
-
 
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
@@ -52,7 +55,7 @@ if(NOT DEFINED CACHE{SSXTOOLS_STDLIB})
 
 	set(SSXTOOLS_STDLIB ${STANDARD_LIBRARY} CACHE STRING "The C++ standard library in use; possible values: libstdc++, libc++, msvc")
 
-	message(STATUS "Detected ${EAGLE_STDLIB}")
+	message(STATUS "Detected C++ standard library \"${SSXTOOLS_STDLIB}\"")
 endif()
 
 set(BIGFILE_ENABLE_EXAMPLES OFF)
@@ -61,6 +64,7 @@ add_subdirectory(vendor/bigfile)
 set(MCOMMON_DO_NOT_INSTALL ON)
 add_subdirectory(vendor/mcommon)
 
+add_subdirectory(src/core)
 add_subdirectory(src/shps)
 
 
