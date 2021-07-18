@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <cassert>
+#include <string>
 
 #include <ssxtools/core/Stream.h>
 #include <ssxtools/core/FourCC.h>
@@ -88,6 +89,8 @@ namespace ssxtools::shps::structures {
 		std::uint32_t unk_bitfield_1;
 		std::uint32_t unk_bitfield_2;
 
+		// Maybe have the data here? Idk
+
 		template<core::Stream Stream>
 		inline bool Transform(Stream& stream) {
 			SSXTOOLS_CATCH_ERROR(stream.template Uint16<std::endian::little>(width));
@@ -110,88 +113,6 @@ namespace ssxtools::shps::structures {
 			SSXTOOLS_CATCH_ERROR(stream.String(name));
 			return true;
 		}
-	};
-
-	/**
-	 * A tagged container for chunks,
-	 * which automatically handles reading and accessing of the proper chunk type.
-	 * TODO: Should this be here? Seems a bit higher level than the structures here.
-	 */
-	struct ChunkUnion {
-		template<core::Stream Stream>
-		inline bool Transform(Stream& stream) {
-			SSXTOOLS_CATCH_ERROR(stream.template Other(header));
-			// if not writing, we might need to add the alignment data.
-			switch(header.type) {
-				case Chunk::Type::Image4Bpp:
-				case Chunk::Type::Image8Bpp:
-				case Chunk::Type::Image32Bpp:
-				case Chunk::Type::Palette: // Ask EA, not me
-					SSXTOOLS_CATCH_ERROR(TransformUnion<ShapeHeaderChunk>(shape, stream));
-
-				case Chunk::Type::FullName:
-					SSXTOOLS_CATCH_ERROR(TransformUnion<FullNameChunk>(name, stream));
-			}
-			return true;
-		}
-
-		inline Chunk& GetHeader() {
-			return header;
-		}
-
-		inline const Chunk& GetHeader() const {
-			return header;
-		}
-
-		/**
-		 * Get a given fully defined chunk type
-		 */
-		template<class T>
-		inline T& GetChunk() {
-			if constexpr(std::is_same_v<T, ShapeHeaderChunk>) {
-				switch(header.type) {
-					case Chunk::Type::Image4Bpp:
-					case Chunk::Type::Image8Bpp:
-					case Chunk::Type::Image32Bpp:
-					case Chunk::Type::Palette:
-						return shape;
-				}
-				// This assert shouldn't be reached
-				assert(false);
-			}
-
-			if constexpr(std::is_same_v<T, FullNameChunk>) {
-				assert(header.type == Chunk::Type::FullName);
-				return name;
-			}
-		}
-
-	   private:
-		Chunk header;
-
-		// helper to shorten the transform switch
-		template<core::Stream Stream, class T>
-		inline bool TransformUnion(T& t, Stream& stream) {
-			// This placement new should only be done for reading.
-			if constexpr(Stream::IsReadStream())
-				new(&t) T();
-			SSXTOOLS_CATCH_ERROR(stream.template Other(t));
-		}
-
-		union {
-			// the whole memory of the union
-			std::uint8_t memory[sizeof(ShapeHeaderChunk) + sizeof(FullNameChunk)];
-
-			// accessor used when header.type is a image
-			struct {
-				ShapeHeaderChunk shape;
-			};
-
-			// accessor used when header.type is the fullname chunk
-			struct {
-				FullNameChunk name;
-			};
-		};
 	};
 
 	// static_assert's to make sure all this is lined up with the ssh docs

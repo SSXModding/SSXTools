@@ -20,6 +20,9 @@ namespace ssxtools::core {
 	template<class T>
 	concept Stream = requires(T stream) {
 		typename T::IsStream;
+
+		// This is a consteval static trait function which returns true
+		// if the stream is reading.
 		{ T::IsReadStream() } -> std::same_as<bool>;
 	};
 

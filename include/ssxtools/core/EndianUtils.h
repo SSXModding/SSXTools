@@ -105,30 +105,27 @@ namespace ssxtools::core {
 			return *static_cast<T*>(ptr);
 		}
 
-		/**
-		 * Type trait for computing the opposite endian of a certain endian.
-		 */
-		template<std::endian E>
-		struct OppositeEndian {};
-
-		template<>
-		struct OppositeEndian<std::endian::little> : public std::integral_constant<std::endian, std::endian::big> {};
-
-		template<>
-		struct OppositeEndian<std::endian::big> : public std::integral_constant<std::endian, std::endian::little> {};
+		consteval std::endian OppositeEndian(std::endian e) {
+			switch(e) {
+				case std::endian::little:
+					return std::endian::big;
+				case std::endian::big:
+					return std::endian::little;
+			}
+		}
 
 	} // namespace detail
 
 	template<std::endian Endian, class T>
 	std::remove_cvref_t<T> ReadEndian(const std::uint8_t* base) requires(IsSwappable<std::remove_cvref_t<T>>) {
 		const auto& ref = detail::PointerTo<const std::remove_cvref_t<T>>(base);
-		return detail::SwapIfEndian<detail::OppositeEndian<Endian>::value, std::remove_cvref_t<T>>(ref);
+		return detail::SwapIfEndian<detail::OppositeEndian(Endian), std::remove_cvref_t<T>>(ref);
 	}
 
 	template<std::endian Endian, class T>
 	void WriteEndian(std::uint8_t* base, const std::remove_cvref_t<T>& val) requires(IsSwappable<std::remove_cvref_t<T>>) {
 		auto& i = detail::PointerTo<std::remove_cvref_t<T>>(base);
-		i = detail::SwapIfEndian<detail::OppositeEndian<Endian>::value, std::remove_cvref_t<T>>(val);
+		i = detail::SwapIfEndian<detail::OppositeEndian(Endian), std::remove_cvref_t<T>>(val);
 	}
 
 } // namespace ssxtools::core

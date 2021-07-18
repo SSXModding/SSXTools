@@ -1,4 +1,5 @@
 set(SHPS_SOURCES
+		ChunkUnion.cpp
 		old/ShpsReader.cpp
 		old/ShpsConverter.cpp
 		old/stbimpl.cpp)
@@ -19,4 +20,4 @@ elseif(SSXTOOLS_STDLIB STREQUAL "libstdc++")
 	target_link_libraries(ssxtools-shps stdc++fs)
 endif()
 
-target_link_libraries(ssxtools-shps mcommon bigfile)
+target_link_libraries(ssxtools-shps SSXTools::Core mcommon bigfile)
