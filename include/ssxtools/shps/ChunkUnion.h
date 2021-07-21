@@ -65,7 +65,7 @@ namespace ssxtools::shps {
 		template<class T>
 		inline T& GetChunk() {
 			if constexpr(std::is_same_v<T, structures::ShapeHeaderChunk>) {
-				assert(GetGeneralType() == GeneralizedType::Image);
+				assert(GetGeneralType() == GeneralizedType::Image || GetGeneralType() == GeneralizedType::Palette);
 				return a.shape;
 			} else if constexpr(std::is_same_v<T, structures::FullNameChunk>) {
 				assert(GetGeneralType() == GeneralizedType::FullName);
