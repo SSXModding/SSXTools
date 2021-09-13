@@ -22,7 +22,7 @@ namespace ssxtools::core {
 			return false;
 
 		// This isn't terribly performant, but there really isn't much that needs
-		// string reading, so it's fine.
+		// zero terminated string reading, so it's fine.
 		char c;
 		while(true) {
 			if(!stream.get(c))
@@ -36,18 +36,16 @@ namespace ssxtools::core {
 		return true;
 	}
 
-	/**
-	 * Get the raw stream this is wrapping.
-	 */
 	std::istream& IoStreamReadStream::GetStream() const {
 		return stream;
 	}
 
 	// This pre-instantiates all of the stream methods, so they're free to use for anything.
-	// Anything not used will get linked out when built as Release anyways.
+	// Anything not used will get linked out when built as Release, anyways.
 #define TYPE(FuncName, T) \
 	template bool IoStreamReadStream::FuncName<std::endian::little>(T&); \
 	template bool IoStreamReadStream::FuncName<std::endian::big>(T&);
 #include <ssxtools/core/StreamTypeListing.inl>
 #undef TYPE
+
 }

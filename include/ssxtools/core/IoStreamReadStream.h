@@ -20,8 +20,6 @@ namespace ssxtools::core {
 
 		// Stream concept implementation
 
-		using IsStream = void; // TODO: Remove this. Stream should only require trait functions, not trait types...
-
 		/**
 		 * Returns whether or not this is a read stream at compile time.
 		 */
@@ -82,19 +80,15 @@ namespace ssxtools::core {
 		 */
 		bool String(std::string& string);
 
-		// TODO: This should be moved lower, Other<T>() is part of Stream
-		// and my brain thinks since this is specific to IoStreamReadStream that
-		// it should be below Stream implmentation
-
-		/**
-		 * Get the raw stream this IoStreamReadStream is wrapping
-		 */
-		[[nodiscard]] std::istream& GetStream() const;
-
 		template<class T>
 		inline bool Other(T& t) {
 			return t.Transform(*this);
 		}
+
+		/**
+		 * Get the raw stream this IoStreamReadStream is wrapping.
+		 */
+		[[nodiscard]] std::istream& GetStream() const;
 
 	   private:
 

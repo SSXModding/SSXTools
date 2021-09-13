@@ -1,7 +1,3 @@
-//
-// Created by lily on 7/13/21.
-//
-
 #ifndef SSXTOOLS_CONCEPTS_H
 #define SSXTOOLS_CONCEPTS_H
 
@@ -18,12 +14,17 @@ namespace ssxtools::core {
 	 * and can be molded into whatever the stream user wants.
 	 */
 	template<class T>
-	concept Stream = requires(T stream) {
-		typename T::IsStream;
-
+	concept Stream = requires(T stream, std::uint8_t byte){
 		// This is a consteval static trait function which returns true
-		// if the stream is reading.
+		// if the stream is a read stream.
+		//
+		// If the stream is in fact reading, then all methods on it will go from,
+		// say "Byte(const std::uint8_t&)" to "Byte(std::uint8_t&)" and the read result
+		// will go into the passed reference.
 		{ T::IsReadStream() } -> std::same_as<bool>;
+		
+		// Byte() is one of the few functions we can test for.
+		{ stream.Byte(byte) } -> std::same_as<bool>;
 	};
 
 	/**
