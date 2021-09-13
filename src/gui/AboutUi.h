@@ -2,8 +2,8 @@
 // Created by lily on 7/12/21.
 //
 
-#ifndef EAGLE_ABOUTUI_H
-#define EAGLE_ABOUTUI_H
+#ifndef SSXTOOLS_ABOUTUI_H
+#define SSXTOOLS_ABOUTUI_H
 
 #include <QDialog>
 
@@ -12,7 +12,7 @@
 namespace ssxtools::ui {
 
 	/**
- 	 * Simple modal about UI.
+ 	 * Simple little modal about UI.
  	 */
 	struct AboutUi : public QDialog {
 		Q_OBJECT
@@ -25,4 +25,4 @@ namespace ssxtools::ui {
 
 } // namespace ssxtools::ui
 
-#endif //EAGLE_ABOUTUI_H
+#endif //SSXTOOLS_ABOUTUI_H

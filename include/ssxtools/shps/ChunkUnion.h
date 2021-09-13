@@ -26,12 +26,12 @@ namespace ssxtools::shps {
 		 */
 		template<class... T>
 		using UnionMemory = std::uint8_t[CombinedSizeOf<T...>()];
+
 	}
 
 	/**
 	 * A tagged container for chunks,
 	 * which automatically handles reading and accessing of the proper chunk data type(s).
-	 * TODO: Should this be here? Seems a bit higher level than the structures here.
 	 */
 	struct ChunkUnion {
 		enum class GeneralizedType : std::uint8_t {
@@ -48,7 +48,7 @@ namespace ssxtools::shps {
 			SSXTOOLS_CATCH_ERROR(stream.template Other(header));
 
 			// Populate the generalized type if reading.
-			if(Stream::IsReadStream())
+			if constexpr(Stream::IsReadStream())
 				GeneralType = GeneralizedTypeFromChunkType(header.type);
 
 			// if not writing, we might need to add the alignment data.
@@ -64,6 +64,8 @@ namespace ssxtools::shps {
 			}
 			return true;
 		}
+
+		// operator=& template
 
 		structures::Chunk& GetHeader();
 		const structures::Chunk& GetHeader() const;

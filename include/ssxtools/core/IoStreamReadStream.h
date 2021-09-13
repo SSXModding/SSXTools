@@ -14,25 +14,34 @@
 namespace ssxtools::core {
 
 	/**
-	 * A Stream which wraps a IOStreams input stream for reading.
+	 * A Stream which wraps a C++ IOStreams input stream for reading.
 	 */
 	struct IoStreamReadStream {
-		using IsStream = void; // this class is in fact a Stream
 
-		explicit IoStreamReadStream(std::istream& stream)
-			: stream(stream) {
-		}
+		// Stream concept implementation
+
+		using IsStream = void; // TODO: Remove this. Stream should only require trait functions, not trait types...
 
 		/**
-		 * Trait function, returns whether or not this is a read stream at compile time
+		 * Returns whether or not this is a read stream at compile time.
 		 */
 		consteval static bool IsReadStream() {
 			return true;
 		}
 
+		explicit IoStreamReadStream(std::istream& stream)
+			: stream(stream) {
+		}
+
 		bool Byte(std::uint8_t& b);
 
-		// This template is written once and expanded.
+		// TODO: SByte()?
+
+// This template is written once and expanded,
+// using IoStreamReadStream::ReadThing<Endian, T>() as a helper,
+// to avoid writing the same code so many times.
+//
+// I'm sorry. Forgive me for my 
 #define TYPE(methodName, T)    \
 	template<std::endian Endian>     \
 	inline bool methodName(T& t) {   \
@@ -40,6 +49,8 @@ namespace ssxtools::core {
 	}
 #include <ssxtools/core/StreamTypeListing.inl>
 #undef TYPE
+
+		// FIXME: Document these methods, they are part of Stream
 
 		template<std::size_t N>
 		inline bool FixedSizeArray(std::uint8_t(&arr)[N]) {
@@ -65,12 +76,20 @@ namespace ssxtools::core {
 			return true;
 		}
 
-		bool String(std::string& string);
 
 		/**
-		 * Get the raw stream this is wrapping.
+		 * Read a *null-terminated* string.
 		 */
-		std::istream& GetStream() const;
+		bool String(std::string& string);
+
+		// TODO: This should be moved lower, Other<T>() is part of Stream
+		// and my brain thinks since this is specific to IoStreamReadStream that
+		// it should be below Stream implmentation
+
+		/**
+		 * Get the raw stream this IoStreamReadStream is wrapping
+		 */
+		[[nodiscard]] std::istream& GetStream() const;
 
 		template<class T>
 		inline bool Other(T& t) {
@@ -78,19 +97,27 @@ namespace ssxtools::core {
 		}
 
 	   private:
+
 		/**
 		 * Internal helper for most types.
 		 */
 		template<std::endian Endian, class T>
 		inline bool ReadThing(T& t) {
+			// Don't bother.
 			if(!stream)
 				return false;
 
-			// This buffer is used to read the swappable object in.
 			std::uint8_t readin_buffer[sizeof(T)];
+
+			// Meh... Could we use FixedArray<sizeof(T)>()?
+			// that way we could catch an EOF or something a little nicer
 			stream.read(reinterpret_cast<char*>(&readin_buffer[0]), sizeof(T));
 
-			// This will reinterpret the object properly with endian (temporarily copying it).
+			// This will reinterpret the object properly (temporarily copying it.) and swap its endian
+			// if required.
+			//
+			// But, really, it's stack space we're copying, so it's not too big of a deal,
+			// as it will be freed at the end of the day when returning.
 			t = core::ReadEndian<Endian, T>(&readin_buffer[0]);
 			return true;
 		}

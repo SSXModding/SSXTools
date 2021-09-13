@@ -26,7 +26,7 @@ namespace ssxtools::shps {
 		/**
 		 * The name of the shape.
 		 * This is set to the TOC name-code by default, but if the shape has a full-name
-		 * it will be set to that.
+		 * it will be set to that. TODO: Still allow TOC name code, if desired?
 		 */
 		std::string Name;
 	};

@@ -28,7 +28,7 @@ namespace ssxtools::core {
 
 	/**
 	 * Handy macro to avoid writing the boilerplate to
-	 * catch an error during transformation.
+	 * catch an error during transformation, just wrap your call in this instead!
 	 */
 #define SSXTOOLS_CATCH_ERROR(x) if(!(x)) return false
 

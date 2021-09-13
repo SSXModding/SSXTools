@@ -21,12 +21,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "Lily"
-            VALUE "FileDescription", "EAGLe"
+            VALUE "FileDescription", "SSXTools GUI"
             VALUE "FileVersion", "1.0"
-            VALUE "InternalName", "EAGLe"
+            VALUE "InternalName", "SSXTools GUI"
             VALUE "LegalTrademarks", "Licensed under the GNU Lesser General Public License Version 3."
             VALUE "OriginalFilename", "ssxtools.exe"
-            VALUE "ProductName", "EAGLe"
+            VALUE "ProductName", "SSXTools GUI"
             VALUE "ProductVersion", "1.0"
         END
     END

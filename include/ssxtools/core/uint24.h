@@ -13,7 +13,7 @@ namespace ssxtools::core {
 		/**
 		 * A sane 24-bit integer type.
 		 */
-		template<bool BE>
+		template<bool BE> // TODO: We're C++20, we can use std::endian.
 		struct basic_uint24 {
 		   private: // TODO: Public?
 			constexpr void Set(std::uint32_t val) {
@@ -59,6 +59,8 @@ namespace ssxtools::core {
 #undef BASICOP
 
 			// TODO: Implement Transform for this properly (needed for shape chunks and c0fb)
+			// Since basic_uint24 does endian handling itself (unfortunately),
+			// couldn't this just be FixedArray<sizeof(bytes_)>()?
 			template<core::Stream Stream>
 			inline bool Transform(Stream& stream) {
 				return true;
@@ -68,8 +70,8 @@ namespace ssxtools::core {
 			std::uint8_t bytes_[3];
 		};
 
-		// sanity checks
-		static_assert(sizeof(basic_uint24<false>) == 3, "Your compiler sucks and basic_uint24<> somehow isn't 3 bytes on it. Get a better one");
+		static_assert(sizeof(basic_uint24<false>) == 3, "Your compiler sucks and basic_uint24<false> somehow is not 3 bytes in size. Get a better one");
+
 	} // namespace detail
 
 	// uint24 types
@@ -84,11 +86,8 @@ namespace ssxtools::core {
 	 */
 	using uint24be = detail::basic_uint24<true>;
 
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ || defined(_WIN32)
-	using uint24 = detail::basic_uint24<false>;
-#else
-	using uint24 = detail::basic_uint24<true>;
-#endif
+	// this using is NEVER used. Drop it?
+	using uint24 = detail::basic_uint24<std::endian::native == std::endian::big>;
 
 } // namespace ssxtools::shps
 
