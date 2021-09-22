@@ -2,18 +2,36 @@
 
 namespace ssxtools::core {
 
+	bool IoStreamReadStream::Seek(StreamOff pos, StreamSeekDirection dir) {
+		if(!stream)
+			return false;
+
+		switch(dir) {
+			case StreamSeekDirection::Begin:
+				stream.seekg(pos, std::istream::beg);
+				break;
+			case StreamSeekDirection::Current:
+				stream.seekg(pos, std::istream::cur);
+				break;
+			case StreamSeekDirection::End:
+				stream.seekg(pos, std::istream::end);
+				break;
+		}
+
+		return true;
+	}
+
+	StreamOff IoStreamReadStream::Tell() const {
+		if(!stream)
+			return -1;
+
+		return stream.tellg();
+	}
 
 	bool IoStreamReadStream::Byte(std::uint8_t& b) {
-
 		if(!stream.get(reinterpret_cast<char&>(b)))
 			return false;
 		return true;
-
-		//if(stream.good())
-		//	b = stream.get();
-		//else
-		//	return false;
-		//return true;
 	}
 
 
@@ -31,11 +49,16 @@ namespace ssxtools::core {
 			if(c == '\0')
 				break;
 
-			string += c;
+			// while += c does the same thing as what I'm doing here (unlike the travesty that is the CLR's System.String type in this regard),
+			// this is slightly more direct.
+			string.push_back(c);
 		}
 		return true;
 	}
 
+	/**
+	 * Get the wrapped stream.
+	 */
 	std::istream& IoStreamReadStream::GetStream() const {
 		return stream;
 	}

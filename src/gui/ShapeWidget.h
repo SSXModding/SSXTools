@@ -3,9 +3,7 @@
 
 #include <ssxtools/shps/ShpsStructs.h>
 
-#define INQT
 #include <ssxtools/shps/ShpsConverter.h>
-#undef INQT
 
 #include <QWidget>
 #include <QImage>
@@ -43,7 +41,7 @@ namespace ssxtools::ui {
 		//}
 
 	   protected:
-		void paintEvent(QPaintEvent*);
+		void paintEvent(QPaintEvent*) override;
 
 	   private:
 		QImage qtImage;
@@ -51,7 +49,7 @@ namespace ssxtools::ui {
 		/**
 		 * The backing raw buffer for the qt image.
 		 */
-		std::vector<mco::byte> rawBuffer;
+		std::vector<std::uint8_t> rawBuffer;
 		//shps::shps::Image* painting_shape = nullptr;
 	};
 

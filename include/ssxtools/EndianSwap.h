@@ -53,7 +53,7 @@ namespace ssxtools::core {
 			T temp {};
 			memcpy(&temp, &value, sizeof(T));
 
-			for(int32 i = 0; i < sizeof(T); i += sizeof(std::uint16_t))
+			for(std::size_t i = 0; i < sizeof(T); i += sizeof(std::uint16_t))
 				((std::uint16_t*)&temp)[i] = BYTESWAP16(((std::uint16_t*)&temp)[i]);
 
 			return temp;

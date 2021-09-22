@@ -14,7 +14,7 @@ namespace ssxtools::shps {
 	 * Template function to read palette so I don't repeat myself as much
 	 * \tparam N amount of colors to read
 	 */
-	template<core::uint16 N>
+	template<std::uint16_t N>
 	constexpr void ReadPalette(std::vector<Bgra8888>& palette, mco::BinaryReader& reader) {
 		palette.resize(N);
 
@@ -23,7 +23,7 @@ namespace ssxtools::shps {
 	}
 
 	bool ShpsReader::CheckValidHeader(const FileHeader& header) {
-		if(core::EndianSwap(header.Magic) == core::MakeFourCCValue("SHPS")) {
+		if(core::EndianSwap(header.Magic) == core::FourCCValue("SHPS")) {
 			auto length = [&]() {
 				auto oldpos = reader.raw().tellg();
 				reader.raw().seekg(0, std::istream::end);
@@ -54,7 +54,7 @@ namespace ssxtools::shps {
 	}
 
 	void ShpsReader::ReadTOC() {
-		for(core::uint32 i = 0; i < header.FileTextureCount; ++i) {
+		for(std::uint32_t i = 0; i < header.FileTextureCount; ++i) {
 			shps::TocEntry entry {};
 			reader.ReadSingleType(entry);
 
@@ -81,7 +81,7 @@ namespace ssxtools::shps {
 		image.index = imageIndex;
 		image.toc_entry = tocEntry;
 
-		core::uint64 size {};
+		std::uint64_t size {};
 
 		reader.raw().seekg(tocEntry.StartOffset, std::istream::beg);
 		reader.ReadSingleType<ImageHeader>(image);
@@ -130,7 +130,7 @@ namespace ssxtools::shps {
 			image.data.resize(decompressed.size());
 
 			// Copy the decompressed data into the image.
-			memcpy(&image.data[0], &decompressed[0], decompressed.size() * sizeof(core::byte));
+			memcpy(&image.data[0], &decompressed[0], decompressed.size() * sizeof(std::uint8_t));
 		}
 
 		// Read in the CLUT header if we are a palettized shape.

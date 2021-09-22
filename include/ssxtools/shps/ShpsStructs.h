@@ -1,6 +1,8 @@
+// This header file is deprecated, the replacement is shps/Structures.h
 #pragma once
 #include <cstdint>
 #include <ssxtools/Core.h>
+#include <ssxtools/core/FourCC.h>
 #include <ssxtools/core/uint24.h>
 
 namespace ssxtools::shps {
@@ -9,37 +11,37 @@ namespace ssxtools::shps {
 	// We'll need these for some Gimex version specific stuff
 
 	// Gimex version for SSX (2000). Doesn't seem to put a real version here
-	constexpr static core::uint32 GimexVersion_SSX = core::MakeFourCCValue("GIMX");
+	constexpr static std::uint32_t GimexVersion_SSX = core::FourCCValue("GIMX");
 
 	// Gimex version for SSX Tricky (2001).
-	constexpr static core::uint32 GimexVersion_SSXT = core::MakeFourCCValue("G278");
+	constexpr static std::uint32_t GimexVersion_SSXT = core::FourCCValue("G278");
 
 	// Gimex version for SSX 3.
-	constexpr static core::uint32 GimexVersion_SSX3 = core::MakeFourCCValue("G357");
-	constexpr static core::uint32 GimexVersion_SSX3Alt = core::MakeFourCCValue("G355"); // 091103 build
+	constexpr static std::uint32_t GimexVersion_SSX3 = core::FourCCValue("G357");
+	constexpr static std::uint32_t GimexVersion_SSX3Alt = core::FourCCValue("G355"); // 091103 build
 
 	/*
 	 * Header of Gimex shape files.
 	 */
 	struct FileHeader {
 		// File magic (SHPS)
-		core::uint32 Magic;
+		std::uint32_t Magic;
 
 		/**
 		 * Size of the entire shape file in bytes.
 		 */
-		core::uint32 FileLength;
+		std::uint32_t FileLength;
 
 		/**
 		 * The count of textures in this shape file
 		 */
-		core::uint32 FileTextureCount;
+		std::uint32_t FileTextureCount;
 
 		/**
 		 * A 4-byte code of the version of Gimex
 		 * used to create the shape file.
 		 */
-		core::uint32 creator;
+		std::uint32_t creator;
 
 		// TODO: use the array hack that gimex seems to already use?
 	};
@@ -58,13 +60,13 @@ namespace ssxtools::shps {
 		/**
 		 * Start offset.
 		 */
-		core::uint32 StartOffset;
+		std::uint32_t StartOffset;
 	};
 
 	/**
 	 * Shape image format.
 	 */
-	enum class ShapeImageType : core::byte {
+	enum class ShapeImageType : std::uint8_t {
 		Unknown,
 
 		// 4bpp image
@@ -78,7 +80,7 @@ namespace ssxtools::shps {
 	};
 
 	// this is probably a byte like ImageType
-	enum EncodingType : core::uint32 {
+	enum EncodingType :  std::uint32_t {
 		None,
 		Interleaved = 0x00200000,
 		Unknown
@@ -98,14 +100,14 @@ namespace ssxtools::shps {
 		 */
 		core::uint24le clut_offset;
 
-		core::uint16 width;
+		std::uint16_t width;
 
-		core::uint16 height;
+		std::uint16_t height;
 
 		// TODO: these are bit fields too(TM)
-		core::uint32 unknown2;
+		std::uint32_t unknown2;
 
-		core::uint32 unknown3;
+		std::uint32_t unknown3;
 
 		// image data starts after this
 	};
@@ -120,13 +122,13 @@ namespace ssxtools::shps {
 
 		// Is this even used?
 		// Not sure
-		core::uint16 colorCount;
+		std::uint16_t colorCount;
 
-		core::uint16 unknown2;
+		std::uint16_t unknown2;
 
-		core::uint32 unknown3;
+		std::uint32_t unknown3;
 
-		core::uint32 unknown4;
+		std::uint32_t unknown4;
 
 		// palette data as a array of bgra8888
 	};
@@ -138,19 +140,19 @@ namespace ssxtools::shps {
 		/**
 		 * total value
 		 */
-		core::uint32 total;
+		std::uint32_t total;
 
 		/**
 		 * Struct accessor for accessing individual components of the color
 		 */
 		struct {
-			core::byte b;
+			std::uint8_t b;
 
-			core::byte g;
+			std::uint8_t g;
 
-			core::byte r;
+			std::uint8_t r;
 
-			core::byte a;
+			std::uint8_t a;
 		};
 	};
 
@@ -174,7 +176,7 @@ namespace ssxtools::shps {
 		 *
 		 * Under LUT256 and LUT128, this will contain indexes suitable for the palette array.
 		 */
-		std::vector<core::byte> data;
+		std::vector<std::uint8_t> data;
 
 		/**
 		 * Palette used if this image is palettized.

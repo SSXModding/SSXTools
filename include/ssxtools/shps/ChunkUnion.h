@@ -6,6 +6,7 @@
 #define SSXTOOLS_CHUNKUNION_H
 
 #include <ssxtools/shps/Structures.h>
+#include <vector>
 
 namespace ssxtools::shps {
 
@@ -51,15 +52,28 @@ namespace ssxtools::shps {
 			if constexpr(Stream::IsReadStream())
 				GeneralType = GeneralizedTypeFromChunkType(header.type);
 
-			// if not writing, we might need to add the alignment data.
+			// if not reading, we might need to add the alignment data depending on Tell() alignment
+			//if constexpr(!Stream::IsReadStream()) {
+			//}
 
 			switch(GetGeneralType()) {
 				case GeneralizedType::Image:
 				case GeneralizedType::Palette:
 					SSXTOOLS_CATCH_ERROR(TransformUnion<structures::ShapeHeaderChunk>(a.shape, stream));
+					// depending on the header chunk type, we'll need to read:
+					// (width*height)/2  (4bpp) bytes
+					// width*height      (8bpp) bytes
+					// (width*height)*2 (16bpp) bytes
+					// (width*height)*4 (32bpp) bytes (ditto for Palette.)
+					// of extra data.
+					switch(header.type) {
+						case structures::Chunk::Type::Image8Bpp:
+							break;
+					}
 					break;
 				case GeneralizedType::FullName:
 					SSXTOOLS_CATCH_ERROR(TransformUnion<structures::FullNameChunk>(b.fullName, stream));
+					// extra data is just the null terminated string.
 					break;
 			}
 			return true;
@@ -138,6 +152,11 @@ namespace ssxtools::shps {
 				structures::FullNameChunk fullName;
 			} b;
 		};
+
+		/**
+		 * Data after the chunk header.
+		 */
+		std::vector<std::uint8_t> chunkExtraData;
 	};
 } // namespace ssxtools::shps
 

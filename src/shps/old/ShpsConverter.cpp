@@ -14,7 +14,7 @@ namespace ssxtools::shps {
 		 *
 		 * \param[in] val val.
 		 */
-		inline core::byte MultiplyValue(core::byte val) {
+		inline std::uint8_t MultiplyValue(std::uint8_t val) {
 			// Multiply the stored value by 2
 			// or round it directly up to 255 if it's 128.
 			// We do this instead of blindly multiplying the value
@@ -29,50 +29,7 @@ namespace ssxtools::shps {
 			return 255;
 		}
 
-		// TODO: we should only detour to this if the user doesn't give an option
-		// whether in the UI (i don't know where I'd put this) or in the cli (say --disable-ssxhack or --enable-ssxhack)
-		/**
-		 * Function called **ONCE** on the shps::Image to determine if it possibly
-		 * went through the fabled
-		 * `FIXSSH.BAT` (the Winter Jampack 2001 build of SSX Tricky accidentally shipped with this)
-		 * aka `gx -pixela/2,r/2,g/2,b/2 -csm2 %1`.
-		 * If it did, the hack should be enabled.
-		 */
-		bool ShouldEnableSSXHack(shps::Image& image) {
-			// test
-			auto test = [](core::byte c) {
-				return c != 255 && c != 0 /* Seems to fix some other textures */ && std::max(c, (core::byte)128) == 128;
-			};
-
-			shps::Bgra8888 MaxColor{};
-
-			if(image.palette.empty()) {
-				// Detour to a much slower impl
-				// that gets the max pixel in the entire image.
-				// This will be far slower than if we had a palette,
-				// but it's the only way we can determine it on 32bpp images.
-
-				MaxColor = core::MaxSpanElement(mco::MakeSpan((Bgra8888*)image.data.data(), image.width * image.height), [](const Bgra8888& l, const Bgra8888& r) {
-					return std::max(l.r, r.r) && std::max(l.g, r.g) && std::max(l.b, r.b) && std::max(l.a, r.a);
-				});
-			} else {
-				// Use a faster method that just gets the max palette.
-
-				MaxColor = core::MaxSpanElement(mco::MakeSpan(image.palette.data(), image.palette.size()), [](const Bgra8888& l, const Bgra8888& r) {
-					return std::max(l.r, r.r) && std::max(l.g, r.g) && std::max(l.b, r.b) && std::max(l.a, r.a);
-				});
-
-			}
-
-			// TODO: Fix this hack detection,
-			// or have the user explicitly enable it.
-
-			return false;
-			// seems the best way to detect this hack is to test just the alpha
-			return test(MaxColor.a);
-		}
-
-		bool ShpsConverter::BuildImageBuffer(std::vector<core::byte>& imageBuffer, Image& image, bool ssxHack) {
+		bool ShpsConverter::BuildImageBuffer(std::vector<std::uint8_t>& imageBuffer, Image& image, bool ssxHack) {
 			if(image.data.empty()) {
 				//logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
@@ -93,8 +50,8 @@ namespace ssxtools::shps {
 			switch(image.format) {
 				case ShapeImageType::Lut128: {
 					//logger.info("Image ", image.index, " is an 4bpp image.");
-					core::byte* normalizedDataPtr = imageBuffer.data();
-					core::byte* texPixelPtr = image.data.data();
+					std::uint8_t* normalizedDataPtr = imageBuffer.data();
+					std::uint8_t* texPixelPtr = image.data.data();
 
 					// Write each pixel to the image buffer that we save.
 					// We do this by looking in the LUT for each pixel and setting the colors there.
@@ -116,10 +73,10 @@ namespace ssxtools::shps {
 
 				case ShapeImageType::Lut256: {
 					//logger.info("Image ", image.index, " is an 8bpp image.");
-					core::byte* normalizedDataPtr = imageBuffer.data();
+					std::uint8_t* normalizedDataPtr = imageBuffer.data();
 
 					// Current pixel.
-					core::byte* texPixelPtr = image.data.data();
+					std::uint8_t* texPixelPtr = image.data.data();
 
 					// Write each pixel to the image buffer that we save.
 					// We do this by looking in the LUT for each pixel and setting the colors there.
@@ -143,7 +100,7 @@ namespace ssxtools::shps {
 				case ShapeImageType::NonLut32Bpp: {
 					//logger.info("Image ", image.index, " is an 32bpp image.");
 
-					core::byte* normalizedDataPtr = imageBuffer.data();
+					std::uint8_t* normalizedDataPtr = imageBuffer.data();
 
 					// We cast the image data (which is just individual bytes) to Bgra8888* because
 					// non-LUT images directly use Bgra8888.
@@ -179,7 +136,7 @@ namespace ssxtools::shps {
 			// avoid weird images entirely,
 			// helps avoid crashing on certain things
 			if(image.data.empty()) {
-				logger.error("Image ", image.index, " is empty or unknown format!");
+			//	logger.error("Image ", image.index, " is empty or unknown format!");
 				return false;
 			}
 
@@ -187,16 +144,16 @@ namespace ssxtools::shps {
 			std::filesystem::create_directories(path);
 			std::string outFilename = (path / std::filesystem::path(std::to_string(image.index)).replace_extension(".PNG")).string();
 
-			std::vector<core::byte> imageData;
+			std::vector<std::uint8_t> imageData;
 
 			// build image buffer
 			if(!BuildImageBuffer(imageData, image)) {
-				logger.error("Could not build image buffer...");
+				//logger.error("Could not build image buffer...");
 			}
 
 			// Finally, write the PNG after we've made the data buffers.
-			stbi_write_png(outFilename.c_str(), image.width, image.height, ShpsConverter::ChannelCount, imageData.data(), (image.width * ShpsConverter::ChannelCount));
-			logger.info("Image ", image.index, " (" , core::EnumToString(image.format), ")", " written to \"", outFilename, "\".");
+			//stbi_write_png(outFilename.c_str(), image.width, image.height, ShpsConverter::ChannelCount, imageData.data(), (image.width * ShpsConverter::ChannelCount));
+			//logger.info("Image ", image.index, " (" , core::EnumToString(image.format), ")", " written to \"", outFilename, "\".");
 
 			// Clear the PNG data buffer after we're done.
 			imageData.clear();

@@ -5,12 +5,6 @@
 #include <filesystem>
 #include <functional>
 
-#include <modeco/Logger.h>
-#ifdef INQT
-	#undef error
-	#undef verbose
-#endif
-
 namespace ssxtools::shps {
 
 	/**
@@ -20,7 +14,7 @@ namespace ssxtools::shps {
 		/**
 		 * How many channels are in the final image buffer.
 		 */
-		constexpr static core::byte ChannelCount = 4;
+		constexpr static std::uint8_t ChannelCount = 4;
 
 		/**
 		 * Builds a normal 32bpp RGBA image from a SHPS image.
@@ -29,7 +23,7 @@ namespace ssxtools::shps {
 		 * \param[in] imageBuffer Image buffer to write to.
 		 * \param[in] image SHPS image to write
 		 */
-		bool BuildImageBuffer(std::vector<core::byte>& imageBuffer, Image& image, bool ssxHack = false);
+		bool BuildImageBuffer(std::vector<std::uint8_t>& imageBuffer, Image& image, bool ssxHack = false);
 
 		/**
 		 * Write the provided SHPS image to a PNG file.
@@ -44,9 +38,6 @@ namespace ssxtools::shps {
 		 * \param[in] output_path The output path.
 		 */
 		bool WritePNG(Image& image, const std::filesystem::path& input_path, const std::filesystem::path& output_path);
-
-	   private:
-		mco::Logger logger = mco::Logger::CreateLogger("SHPSConverter");
 	};
 
 } // namespace ssxtools::shps

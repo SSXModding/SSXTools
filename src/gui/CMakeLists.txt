@@ -44,6 +44,21 @@ find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
 
 file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/temp_ssxtools_path" CONTENT "$<TARGET_FILE:ssxtools>")
 
+set(WINDEPLOYQT_ARGUMENTS
+		--dry-run
+		--no-translations
+		--no-system-d3d-compiler
+		--no-angle
+		--no-opengl-sw
+		--list mapping)
+
+# Allow windeployqt to install libgcc/libstdc++/libwinpthread, for MinGW-w64 builds.
+if(NOT MSVC)
+	set(WINDEPLOYQT_ARGUMENTS ${WINDEPLOYQT_ARGUMENTS}
+		--compiler-runtime
+	)
+endif()
+
 install(CODE
 	"
 	file(READ \"${CMAKE_CURRENT_BINARY_DIR}/temp_ssxtools_path\" _file)
@@ -51,13 +66,7 @@ install(CODE
 	execute_process(
 		COMMAND \"${CMAKE_COMMAND}\" -E
 			env PATH=\"${_qt_bin_dir}\" \"${WINDEPLOYQT_EXECUTABLE}\"
-				--dry-run
-				--no-compiler-runtime
-				--no-translations
-				--no-system-d3d-compiler
-				--no-angle
-				--no-opengl-sw
-				--list mapping
+				${WINDEPLOYQT_ARGUMENTS}
 				\${_file}
 		OUTPUT_VARIABLE _output
 		OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -66,7 +75,7 @@ install(CODE
 	while(_files)
 		list(GET _files 0 _src)
 		list(GET _files 1 _dest)
-		message(STATUS \"Copying QT library \${_src} -> \${_dest} \")
+		message(STATUS \"Copying QT/system library \${_src} -> \${_dest} \")
 		execute_process(
 			COMMAND \"${CMAKE_COMMAND}\" -E
 				copy \${_src} \"\${CMAKE_INSTALL_PREFIX}/\${_dest}\"

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <array>
 
+#include <ssxtools/core/Stream.h>
 #include <ssxtools/core/EndianUtils.h>
 
 namespace ssxtools::core {
@@ -31,6 +32,10 @@ namespace ssxtools::core {
 			: stream(stream) {
 		}
 
+		bool Seek(StreamOff pos, StreamSeekDirection dir);
+
+		StreamOff Tell() const;
+
 		bool Byte(std::uint8_t& b);
 
 		// TODO: SByte()?
@@ -39,7 +44,7 @@ namespace ssxtools::core {
 // using IoStreamReadStream::ReadThing<Endian, T>() as a helper,
 // to avoid writing the same code so many times.
 //
-// I'm sorry. Forgive me for my 
+// I'm sorry. Forgive me for my sins.
 #define TYPE(methodName, T)    \
 	template<std::endian Endian>     \
 	inline bool methodName(T& t) {   \
@@ -73,7 +78,6 @@ namespace ssxtools::core {
 
 			return true;
 		}
-
 
 		/**
 		 * Read a *null-terminated* string.
