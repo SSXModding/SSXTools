@@ -1,12 +1,12 @@
-#include <ssxtools/EacRiffChunker.hpp>
+#include <ssxtools/EacRiffStream.hpp>
 #include <ssxtools/StreamUtils.hpp>
 
 namespace ssxtools::core {
 
-	EacRiffChunker::EacRiffChunker(std::istream& is) : stream(is) {
+	EacRiffStream::EacRiffStream(std::istream& is) : stream(is) {
 	}
 
-	bool EacRiffChunker::ReadChunkImpl(u32& fourCC, std::vector<u8>& data) {
+	bool EacRiffStream::ReadChunkImpl(u32& fourCC, std::vector<u8>& data) {
 		try {
 			auto riffHeader = ReadStreamType<RiffChunk>(stream);
 			auto size = riffHeader.size - sizeof(RiffChunk);

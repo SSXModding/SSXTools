@@ -10,8 +10,8 @@ namespace ssxtools::core {
 
 	/// This class reads individual RIFF chunks from a stream and essentially functions like
 	/// a depacketizer, allowing the data to be processed elsewhere.
-	struct EacRiffChunker {
-		explicit EacRiffChunker(std::istream& is);
+	struct EacRiffStream {
+		explicit EacRiffStream(std::istream& is);
 
 		/// ChunkCallback is expected to be a callable that has an overload
 		/// for the given signature: `void(u32 fourCC, const std::vector<u8>& data)`
