@@ -25,6 +25,7 @@ ssxtools_set_alternate_linker()
 
 add_subdirectory(projects/libraries/core)
 add_subdirectory(projects/libraries/format)
+add_subdirectory(projects/libraries/io)
 
 add_subdirectory(projects/tools/testtool)
 

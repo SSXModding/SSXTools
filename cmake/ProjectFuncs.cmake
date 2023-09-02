@@ -59,7 +59,6 @@ function(ssxtools_target target)
 endfunction()
 
 function(ssxtools_header_only_target target)
-	message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}")
 	target_include_directories(${target} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_compile_features(${target} INTERFACE cxx_std_20)
 endfunction()
