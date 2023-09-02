@@ -2,9 +2,6 @@
 *.kate-swp
 *.swp
 
-# Cargo
-
-# Since this is a workspace with libraries in it
-# I think this is a good idea, idk tho
-/Cargo.lock
-/target
+.cache/
+build/
+cmake-build-*/
