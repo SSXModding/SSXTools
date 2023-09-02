@@ -13,8 +13,12 @@ namespace ssxtools::core {
 	struct EacRiffStream {
 		explicit EacRiffStream(std::istream& is);
 
+		/// Read a chunk from the given input stream.
+		///
 		/// ChunkCallback is expected to be a callable that has an overload
 		/// for the given signature: `void(u32 fourCC, const std::vector<u8>& data)`
+		///
+		/// This function returns false once the stream has hit the end of the file.
 		template <class ChunkCallback>
 		bool ReadChunk(ChunkCallback&& chunkCallback) {
 			u32 currChunkFcc {};
@@ -31,9 +35,7 @@ namespace ssxtools::core {
 
 	   private:
 		bool ReadChunkImpl(u32& fourCC, std::vector<u8>& data);
-
-		/// the stream we are reading from
-		/// should last longer than this obviously
+		
 		std::istream& stream;
 	};
 

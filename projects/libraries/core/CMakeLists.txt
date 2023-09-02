@@ -1,6 +1,6 @@
 add_library(ssxtools_core
 	src/StreamUtils.cpp
-	src/EacRiffChunker.cpp
+	src/EacRiffStream.cpp
 )
 
 ssxtools_target(ssxtools_core)
