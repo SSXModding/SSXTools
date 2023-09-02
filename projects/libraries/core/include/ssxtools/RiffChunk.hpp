@@ -7,7 +7,7 @@ namespace ssxtools::core {
 
 	/// A RIFF chunk.
 	struct [[gnu::packed]] RiffChunk {
-		u32 ident {};
+		FourCCT ident {};
 		u32 size {};
 	};
 

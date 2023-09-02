@@ -23,7 +23,7 @@ namespace ssxtools {
 			}
 		}
 
-		constexpr std::uint32_t Get() {
+		constexpr std::uint32_t Get() const {
 			if constexpr(Endian == std::endian::big) {
 				return bytes_[0] << 16 | bytes_[1] << 8 | bytes_[2];
 			} else {

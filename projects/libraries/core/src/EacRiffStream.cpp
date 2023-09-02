@@ -6,7 +6,7 @@ namespace ssxtools::core {
 	EacRiffStream::EacRiffStream(std::istream& is) : stream(is) {
 	}
 
-	bool EacRiffStream::ReadChunkImpl(u32& fourCC, std::vector<u8>& data) {
+	bool EacRiffStream::ReadChunkImpl(FourCCT& fourCC, std::vector<u8>& data) {
 		try {
 			auto riffHeader = ReadStreamType<RiffChunk>(stream);
 			auto size = riffHeader.size - sizeof(RiffChunk);

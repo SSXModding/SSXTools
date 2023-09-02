@@ -4,6 +4,7 @@
 #include <ssxtools/RiffChunk.hpp>
 #include <vector>
 
+#include "ssxtools/FourCC.hpp"
 #include "ssxtools/Types.hpp"
 
 namespace ssxtools::core {
@@ -16,12 +17,12 @@ namespace ssxtools::core {
 		/// Read a chunk from the given input stream.
 		///
 		/// ChunkCallback is expected to be a callable that has an overload
-		/// for the given signature: `void(u32 fourCC, const std::vector<u8>& data)`
+		/// for the given signature: `void(FourCCT fourCC, const std::vector<u8>& data)`
 		///
 		/// This function returns false once the stream has hit the end of the file.
 		template <class ChunkCallback>
 		bool ReadChunk(ChunkCallback&& chunkCallback) {
-			u32 currChunkFcc {};
+			FourCCT currChunkFcc {};
 			std::vector<u8> currChunkData {};
 
 			if(ReadChunkImpl(currChunkFcc, currChunkData)) {
@@ -34,8 +35,8 @@ namespace ssxtools::core {
 		}
 
 	   private:
-		bool ReadChunkImpl(u32& fourCC, std::vector<u8>& data);
-		
+		bool ReadChunkImpl(FourCCT& fourCC, std::vector<u8>& data);
+
 		std::istream& stream;
 	};
 
