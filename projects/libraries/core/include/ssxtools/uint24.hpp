@@ -34,6 +34,20 @@ namespace ssxtools {
 	   public:
 		constexpr operator std::uint32_t() const { return Get(); }
 
+		/// transmute to a different endian
+		/// you should PROBABLY do this before any other operations though
+		template <std::endian Endian2>
+		u24<Endian2> Transmute() const {
+			if constexpr(Endian2 == Endian)
+				return *this;
+			else {
+				// copy the bytes over and return a new object
+				u24<Endian2> ret;
+				memcpy(&ret.bytes_[0], &bytes_[0], sizeof(bytes_));
+				return ret;
+			}
+		}
+
 		constexpr u24& operator=(std::uint32_t val) {
 			Set(val);
 			return *this;

@@ -24,7 +24,6 @@ namespace ssxtools::format::ssx3 {
 		End = 0x16		  // no data?
 	};
 
-	template <std::endian Endian>
 	struct StreamInterleaveHeader {
 		/// The resource identifier of this interleaved resource
 		/// (where it goes basically?)
@@ -34,7 +33,7 @@ namespace ssxtools::format::ssx3 {
 		StreamInterleaveType type;
 
 		/// The data size of this interleaved resource.
-		u24<Endian> dataSize;
+		u24<> dataSize;
 	};
 
 } // namespace ssxtools::format::ssx3
