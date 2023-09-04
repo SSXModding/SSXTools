@@ -6,4 +6,5 @@ ssxtools_target(testtool)
 
 target_link_libraries(testtool
 	ssxtools::core
+	ssxtools::io
 )

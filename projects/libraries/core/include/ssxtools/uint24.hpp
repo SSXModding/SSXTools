@@ -8,7 +8,7 @@ namespace ssxtools {
 	struct [[gnu::packed]] u24 {
 	   private:
 		constexpr void Set(u32 val) {
-			if constexpr(Endian == std::endian::little) {
+			if constexpr(Endian == std::endian::big) {
 				bytes_[0] = (val >> 16) & 0xFF;
 				bytes_[1] = (val >> 8) & 0xFF;
 				bytes_[2] = val & 0xFF;
@@ -20,7 +20,7 @@ namespace ssxtools {
 		}
 
 		constexpr u32 Get() const {
-			if constexpr(Endian == std::endian::little) {
+			if constexpr(Endian == std::endian::big) {
 				return bytes_[0] << 16 | bytes_[1] << 8 | bytes_[2];
 			} else {
 				return bytes_[2] << 16 | bytes_[1] << 8 | bytes_[0];

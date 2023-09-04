@@ -11,6 +11,14 @@ namespace ssxtools::io {
 		/// Read.
 		void Read(std::istream& is);
 
+		usize StreamCount() const {
+			return uninterleavedStreams.size();
+		}
+
+		usize StreamDataSize(usize index) const {
+			return uninterleavedStreams[index].size();
+		}
+
 		/// Get a given stream (after reading)
 		format::ssx3::InterleaveHeader* GetStream(usize index) {
 			return std::bit_cast<format::ssx3::InterleaveHeader*>(uninterleavedStreams[index].data());

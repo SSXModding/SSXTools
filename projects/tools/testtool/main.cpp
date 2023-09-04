@@ -1,35 +1,40 @@
 #include <fstream>
-#include <ssxtools/EacRiffInStream.hpp>
-#include <ssxtools/EacRiffOutStream.hpp>
+//#include <ssxtools/EacRiffInStream.hpp>
+//#include <ssxtools/EacRiffOutStream.hpp>
+#include <ssxtools/ssx3/WorldStreamReader.hpp>
+
+#include <format>
 
 namespace ssxcore = ssxtools::core;
+namespace ssxio = ssxtools::io;
 
 int main() {
 	std::ifstream ifs { "/data/sda/lily/games/ssx/ssx3/data/worlds/data/worlds/bam.ssb", std::ifstream::binary };
-	// std::ifstream ifs { "/data/sda/lily/games/ssx/ssx3/data/movies/eabig.mpc", std::ifstream::binary };
+	
+	ssxio::WorldStreamReader streamReader{};
 
-	std::ofstream ofs { "./the_cooler_bam.ssb", std::ofstream::binary };
+	streamReader.Read(ifs);
 
-	ssxcore::EacRiffInStream inStream { ifs };
+	std::cout << "Read " << streamReader.StreamCount() << " streams\n";
 
-	// create a output stream that can output bam.ssb
-	ssxcore::EacRiffOutStream outStream { ofs };
-	outStream.SetAlignment(0x8000);
+	for(usize i = 0; i < streamReader.StreamCount(); ++i) {
+		auto size = streamReader.StreamDataSize(i);
+		auto begin = streamReader.GetStream(i);
+		auto p = streamReader.GetStream(i);
 
-	while(true) {
-		bool ok = inStream.ReadChunk([&](ssxcore::FourCCT fourCC, const std::vector<u8>& data) {
-			if(fourCC == ssxcore::FourCC<"CBXS">()) {
-				outStream.AddChunk<"CBXS">(data);
-			} else if(fourCC == ssxcore::FourCC<"CEND">()) {
-				outStream.AddChunk<"CEND">(data);
-			}
-		});
-		if(!ok)
-			break;
+		auto j = 0;
+		while(p != nullptr) {
+			//std::cout << std::format("travelled {}/{} bytes\n", static_cast<usize>(p - begin), size);
+			if(static_cast<usize>(p - begin) >= size)
+				break;
+
+			//std::cout << std::format("{:08x}\n", *std::bit_cast<u32*>(p));
+			//std::cout << std::format("Stream {}/File {}: RID {}.{}, Type {}, {} bytes\n", i, j, static_cast<u32>(p->rid.uid), p->rid.sectionId, static_cast<u8>(p->type), static_cast<u32>(p->dataSize));
+
+			p = p->NextEntry();
+			j++;
+		}
 	}
-
-	std::cout << "done!\n";
-
-	ofs.flush();
+	
 	return 0;
 }
