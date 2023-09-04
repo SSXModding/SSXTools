@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <ssxtools/RiffChunk.hpp>
+#include <ssxtools/EacRiffChunk.hpp>
 #include <vector>
 
 #include "ssxtools/FourCC.hpp"
@@ -9,10 +9,10 @@
 
 namespace ssxtools::core {
 
-	/// This class reads individual RIFF chunks from a stream and essentially functions like
+	/// This class reads individual EAC-RIFF chunks from a input stream and essentially functions like
 	/// a depacketizer, allowing the data to be processed elsewhere.
-	struct EacRiffStream {
-		explicit EacRiffStream(std::istream& is);
+	struct EacRiffInStream {
+		explicit EacRiffInStream(std::istream& is);
 
 		/// Read a chunk from the given input stream.
 		///

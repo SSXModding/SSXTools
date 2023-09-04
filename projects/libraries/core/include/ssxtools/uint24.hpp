@@ -1,18 +1,14 @@
+#pragma once
 #include <ssxtools/Types.hpp>
 
 namespace ssxtools {
-
-	// TODO: instead of encoding the endian as a type signature
-	// maybe I can do .Get<Endian> to have some sort of runtime dispatch
-	// .. but then stuff would be very very verbose so idk
-	// guess it's trading off some demons for other worse demons
 
 	/// A hopefully-sane uint24 type
 	template <std::endian Endian = std::endian::little>
 	struct [[gnu::packed]] u24 {
 	   private:
-		constexpr void Set(std::uint32_t val) {
-			if constexpr(Endian == std::endian::big) {
+		constexpr void Set(u32 val) {
+			if constexpr(Endian == std::endian::little) {
 				bytes_[0] = (val >> 16) & 0xFF;
 				bytes_[1] = (val >> 8) & 0xFF;
 				bytes_[2] = val & 0xFF;
@@ -23,8 +19,8 @@ namespace ssxtools {
 			}
 		}
 
-		constexpr std::uint32_t Get() const {
-			if constexpr(Endian == std::endian::big) {
+		constexpr u32 Get() const {
+			if constexpr(Endian == std::endian::little) {
 				return bytes_[0] << 16 | bytes_[1] << 8 | bytes_[2];
 			} else {
 				return bytes_[2] << 16 | bytes_[1] << 8 | bytes_[0];
@@ -32,12 +28,11 @@ namespace ssxtools {
 		}
 
 	   public:
-		constexpr operator std::uint32_t() const { return Get(); }
+		constexpr operator u32() const { return Get(); }
 
-		/// transmute to a different endian
-		/// you should PROBABLY do this before any other operations though
+		/// Transmute a u24 read from some data to another endian.
 		template <std::endian Endian2>
-		u24<Endian2> Transmute() const {
+		constexpr u24<Endian2> Transmute() const {
 			if constexpr(Endian2 == Endian)
 				return *this;
 			else {
@@ -48,56 +43,61 @@ namespace ssxtools {
 			}
 		}
 
-		constexpr u24& operator=(std::uint32_t val) {
+		// explicitly allow copy/move
+		constexpr u24() = default;
+		constexpr u24(const u24&) = default;
+		constexpr u24(u24&&) = default;
+
+		constexpr u24 operator=(u32 val) {
 			Set(val);
 			return *this;
 		}
 
-		constexpr u24& operator=(u24 val) {
+		constexpr u24 operator=(u24 val) {
 			Set(val.Get());
 			return *this;
 		}
 
 		// Basic math
 
-		constexpr u24& operator+(const u24& other) {
+		constexpr u24 operator+(const u24 other) {
 			Set(Get() + other.Get());
 			return *this;
 		}
 
-		constexpr u24& operator-(const u24& other) {
+		constexpr u24 operator-(const u24 other) {
 			Set(Get() - other.Get());
 			return *this;
 		}
 
-		constexpr u24& operator/(const u24& other) {
+		constexpr u24 operator/(const u24 other) {
 			Set(Get() / other.Get());
 			return *this;
 		}
 
-		constexpr u24& operator*(const u24& other) {
+		constexpr u24 operator*(const u24 other) {
 			Set(Get() * other.Get());
 			return *this;
 		}
 
 		// Bit operations
 
-		constexpr u24& operator^(const u24& other) {
+		constexpr u24 operator^(const u24 other) {
 			Set(Get() ^ other.Get());
 			return *this;
 		}
 
-		constexpr u24& operator&(const u24& other) {
+		constexpr u24 operator&(const u24 other) {
 			Set(Get() & other.Get());
 			return *this;
 		}
 
-		constexpr u24& operator|(const u24& other) {
+		constexpr u24 operator|(const u24 other) {
 			Set(Get() | other.Get());
 			return *this;
 		}
 
-		constexpr u24& operator~() { Set(~Get()); }
+		constexpr u24 operator~() { Set(~Get()); }
 
 		// NO TOUCHY
 		std::uint8_t bytes_[3];

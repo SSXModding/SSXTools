@@ -1,29 +1,27 @@
 #pragma once
 
-#include <cstdint>
+#include <ssxtools/Types.hpp>
 
 namespace ssxtools::core {
 
-	/**
-	 * A compile-time string. Usable as a C++20 cNTTP.
-	 */
-	template <std::size_t N>
+	/// A compile-time string. Usable as a C++20 cNTTP.
+	template <usize N>
 	struct FixedString {
 		char buf[N + 1] {};
 
-		constexpr FixedString(const char* s) { // NOLINT
-			for(unsigned i = 0; i != N; ++i)
+		constexpr FixedString(const char* s) {
+			for(usize i = 0; i != N; ++i)
 				buf[i] = s[i];
 		}
 
-		constexpr operator const char*() const { // NOLINT
+		constexpr operator const char*() const {
 			return buf;
 		}
 
-		[[nodiscard]] constexpr std::size_t Length() const { return N; }
+		[[nodiscard]] constexpr usize Length() const { return N; }
 	};
 
-	template <std::size_t N>
+	template <usize N>
 	FixedString(char const (&)[N]) -> FixedString<N - 1>;
 
 } // namespace ssxtools::core

@@ -1,20 +1,22 @@
 #pragma once
 #include <ssxtools/Types.hpp>
+#include <ssxtools/uint24.hpp>
 
 namespace ssxtools::format {
 
 	/// a Resource Identifier. This is unique per-section and per resource type.
-	struct RID {
-		constexpr RID() = default;
+	struct [[gnu::packed]] RID {
+		constexpr static RID New(u8 section, u32 uid) {
+			RID r;
+			r.sectionId = section;
+			r.uid = uid;
+			return r;
+		}
 
-		/// The section ID.
-		constexpr u8 SectionId() const { return storage & 0xff; }
-
-		/// The unique ID as a part of this section
-		constexpr u32 Uid() const { return storage >> 24; }
-
-	   private:
-		u32 storage;
+		u24le uid;
+		u8 sectionId;
 	};
+
+	constexpr static RID Global = RID::New(0, 0);
 
 } // namespace ssxtools::format

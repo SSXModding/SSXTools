@@ -64,4 +64,8 @@ namespace ssxtools::core {
 		}
 	}
 
+	void WriteBytes(std::ostream &os, const std::vector<u8> &bytes) {
+		os.write(reinterpret_cast<const char*>(bytes.data()), bytes.size());
+	}
+
 } // namespace ssxtools::core

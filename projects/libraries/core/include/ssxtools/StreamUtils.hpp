@@ -20,15 +20,19 @@ namespace ssxtools::core {
 		return object;
 	}
 
+	std::vector<u8> ReadBytes(std::istream& is, std::size_t size);
+
+	std::string ReadAsciiZString(std::istream& is);
+	std::string ReadAsciiPString(std::istream& is);
+
+
 	template <class T>
 	constexpr void WriteStreamType(std::ostream& os, const T& object) {
 		detail::WriteStreamTypeImpl(os, std::bit_cast<char*>(&object), sizeof(T));
 	}
 
-	std::vector<u8> ReadBytes(std::istream& is, std::size_t size);
+	// overload for span?
+	void WriteBytes(std::ostream& os, const std::vector<u8>& bytes);
 
-	std::string ReadAsciiZString(std::istream& is);
-
-	std::string ReadAsciiPString(std::istream& is);
 
 } // namespace ssxtools::core
