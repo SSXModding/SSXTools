@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ssxtools/Types.hpp>
+#include <string_view>
 
 namespace ssxtools::core {
 
@@ -16,6 +17,10 @@ namespace ssxtools::core {
 
 		constexpr operator const char*() const {
 			return buf;
+		}
+
+		constexpr operator std::string_view() const {
+			return { buf, N };
 		}
 
 		[[nodiscard]] constexpr usize Length() const { return N; }
