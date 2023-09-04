@@ -34,6 +34,31 @@ namespace ssxtools::format::ssx3 {
 
 		/// The data size of this interleaved resource.
 		u24<> dataSize;
+
+		/// Get the data of this resource.
+		constexpr u8* Data() { return std::bit_cast<u8*>(this + 1); }
+
+		/// Get to the next interleave entry
+		constexpr InterleaveHeader* NextEntry() const {
+			if(dataSize == 0)
+				return nullptr;
+
+			return std::bit_cast<InterleaveHeader*>(std::bit_cast<u8*>(this) + dataSize);
+		}
+
+		/// Find a resource with the given RID.
+		constexpr InterleaveHeader* FindRID(const RID rid) {
+			auto p = this;
+			while(p != nullptr) {
+				if(p->rid == rid)
+					return p;
+
+				// move on to the next entry
+				p = p->NextEntry();
+			}
+
+			return nullptr;
+		}
 	};
 
 	// For documentation's sake:

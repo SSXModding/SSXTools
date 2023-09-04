@@ -13,6 +13,9 @@ namespace ssxtools::format {
 			return r;
 		}
 
+		constexpr bool operator==(const RID other) const { return other.uid == uid && other.sectionId == sectionId; }
+		constexpr bool operator!=(const RID other) const { return !(*this == other); }
+
 		u24le uid;
 		u8 sectionId;
 	};

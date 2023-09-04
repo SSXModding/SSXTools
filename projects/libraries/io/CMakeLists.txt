@@ -1,5 +1,5 @@
 add_library(ssxtools_io
-	src/dummy.cpp
+	src/WorldStreamReader.cpp
 )
 
 target_link_libraries(ssxtools_io PUBLIC
