@@ -3,7 +3,7 @@
 #pragma once
 #include <ssxtools/Types.hpp>
 
-namespace ssxtools::format {
+namespace ssxtools::core {
 
 	struct tVec2 {
 		float x;
@@ -34,4 +34,4 @@ namespace ssxtools::format {
 		float b;
 	};
 
-}
+} // namespace ssxtools::core

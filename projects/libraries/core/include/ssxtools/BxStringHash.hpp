@@ -1,6 +1,6 @@
 #pragma once
-#include <ssxtools/Types.hpp>
 #include <ssxtools/FixedString.hpp>
+#include <ssxtools/Types.hpp>
 #include <string_view>
 
 namespace ssxtools::core {
@@ -23,7 +23,7 @@ namespace ssxtools::core {
 	}
 
 	/// BxStringHash() but always at compile time. No buts.
-	template<FixedString str>
+	template <FixedString str>
 	consteval u32 BxStringHash() {
 		return BxStringHash(str);
 	}
@@ -31,4 +31,4 @@ namespace ssxtools::core {
 	static_assert(BxStringHash("mdl_medal_03") == 0x05d26e53, "BxStringHash is not hashing properly.");
 	static_assert(BxStringHash<"mdl_medal_03">() == 0x05d26e53, "BxStringHash (compile-time version) is not hashing properly.");
 
-}
+} // namespace ssxtools::core

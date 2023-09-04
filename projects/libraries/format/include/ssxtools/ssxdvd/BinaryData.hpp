@@ -12,16 +12,10 @@
 
 namespace ssxtools::core {
 
-	enum eBdFormatType : u8 {
-		Generic,
-		Ps2,
-		Xbox,
-		Ngc
-	};
+	enum eBdFormatType : u8 { Generic, Ps2, Xbox, Ngc };
 
 	/// The "hash table" object.
 	struct tBdHashTable {
-		
 		struct Bucket {
 			u32 hash;
 			u32 objectUid;
@@ -62,7 +56,6 @@ namespace ssxtools::core {
 		u32 numCameras;
 		OffsetPtr<Bucket> cameraHash;
 
-		
 		constexpr Bucket* PatchHash() noexcept {
 			if(numPatches == 0)
 				return nullptr;
@@ -101,11 +94,7 @@ namespace ssxtools::core {
 	};
 
 	struct tBdHeader {
-		constexpr static u8 VALID_VERSION[3] {
-			0,
-			21,
-			27
-		};
+		constexpr static u8 VALID_VERSION[3] { 0, 21, 27 };
 
 		u8 version[3];
 		eBdFormatType format;
@@ -153,7 +142,7 @@ namespace ssxtools::core {
 			return hashTable(this);
 		}
 
-		template<eBdFormatType Format>
+		template <eBdFormatType Format>
 		[[nodiscard]] constexpr bool Valid() const noexcept {
 			// This header isn't valid for this file
 			if(format != Format)
@@ -163,4 +152,4 @@ namespace ssxtools::core {
 		}
 	};
 
-} // namespace ssxlev::structs::tricky
+} // namespace ssxtools::core
