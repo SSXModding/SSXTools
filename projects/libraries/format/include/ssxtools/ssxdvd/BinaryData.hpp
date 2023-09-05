@@ -5,14 +5,62 @@
 #include <ssxtools/BxTypes.hpp>
 #include <ssxtools/OffsetPtr.hpp>
 
-// N.B: These structures' helper functions *expect* you have
-// created a large file-sized block, or memory mapped them in
-// beforehand. If you haven't, crashes are an expectation, not
-// a bug in my code.
+// N.B: These structures' helper functions for the most part (unless they do not
+// operate on any data outside of the structure) *expect* you have
+// created a large file-sized block, or memory mapped them in beforehand. 
+//
+// If you haven't, crashes are an expectation, not a bug in my code.
 
 namespace ssxtools::core {
 
 	enum eBdFormatType : u8 { Generic, Ps2, Xbox, Ngc };
+
+	/// A patch object.
+	struct tBdPatch {
+		/// Patch type basically.
+		enum Style : u32 {
+			Reset,
+			SnowStandard,
+			OffTrackStandard,
+			PowderedSnow,
+			SlowPowderedShow,
+			IceStandard,
+			Bounce,
+			IceNoTrail,
+			SnowFresh, //?
+			Rock,
+			Wall,
+			IceNoTrailCrunch,
+			UnkBoardWakeOnly,
+			MetalStandard,
+			Speed, //?
+			SnowStandardDup,
+			SandStandard,
+			Door,
+			MetalShowoffRamp
+		};
+
+		tVec4 lightmapPoint;
+		tVec4 uvPoints[4];
+
+		tMat4 bezierControlPoints;
+
+		tVec3 lowestPoint;
+		tVec3 highestPoint;
+
+		tVec4 points[4];
+
+		Style style;
+
+		u32 unk2;
+		u32 visibility;
+
+		u32 textureId;
+
+		i32 unk4; // -1
+		i32 unk5;
+		i32 unk6;
+	};
 
 	/// The "hash table" object.
 	struct tBdHashTable {
@@ -119,7 +167,7 @@ namespace ssxtools::core {
 		// maybe when lily is not lazy
 
 		u32 PlayerStartsOffset;
-		u32 PatchesOffset;
+		OffsetPtr<tBdPatch> patches;
 		u32 InstancesOffset;
 		u32 ParticleInstancesOffset;
 		u32 MaterialsOffset;
@@ -135,6 +183,10 @@ namespace ssxtools::core {
 		u32 CameraPointerOffset;
 		u32 CameraOffset;
 		OffsetPtr<tBdHashTable> hashTable;
+
+		constexpr tBdPatch* Patches() noexcept {
+			return patches(this);
+		}
 
 		constexpr tBdHashTable* HashTable() noexcept {
 			// The hash table always exists, so we don't need to worry about checking

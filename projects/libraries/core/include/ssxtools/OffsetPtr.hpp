@@ -18,10 +18,15 @@ namespace ssxtools::core {
 	/// [NativeT] is the type of data this would point to
 	/// [OffsetType] is the type of data the "pointer" is repressented as
 	template<class NativeT, class OffsetType = u32>
-	struct OffsetPtr {
+	struct OffsetPtr final {
 		using Type = std::remove_cvref_t<NativeT>;
 		using Pointer = Type*;
 		using ConstPointer = const Type*;
+
+		/// Set the offset. Duh!
+		constexpr void Set(OffsetType newOffset) noexcept {
+			rawOffset = newOffset;
+		}
 
 		[[nodiscard]] constexpr OffsetType Raw() const noexcept {
 			return rawOffset;

@@ -5,7 +5,7 @@
 namespace ssxtools::core {
 
 	/// An output stream adapter which creates EAC-RIFF chunk format data.
-	struct EacRiffOutStream {
+	struct EacRiffOutStream final {
 		// TODO(lily): ...? should be a span<u8>.
 		using ChunkData = std::vector<u8>;
 		explicit EacRiffOutStream(std::ostream& os);

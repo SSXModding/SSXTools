@@ -11,7 +11,7 @@ namespace ssxtools::core {
 
 	/// This class reads individual EAC-RIFF chunks from a input stream and essentially functions like
 	/// a depacketizer, allowing the data to be processed elsewhere.
-	struct EacRiffInStream {
+	struct EacRiffInStream final {
 		explicit EacRiffInStream(std::istream& is);
 
 		/// Read a chunk from the given input stream.

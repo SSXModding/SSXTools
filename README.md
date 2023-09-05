@@ -1,12 +1,13 @@
 ## SSXTools
 
-A set of tools for the SSX games.
-
-Written in rust partially as an experiment, but also so I hopefully can re-use code others have written (e.g: refpack) instead of trying to cobble it together
+A set of libraries for working with game data from the SSX games, that just so happens to come with user tooling.
 
 ## Building
 
-`cargo b --release`
+```bash
+$ cmake -Wno-dev -GNinja -Bbuild -DCMAKE_BUILD_TYPE=Release
+$ cmake --build build
+```
 
 ## Using
 
