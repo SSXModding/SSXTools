@@ -3,8 +3,14 @@
 #include <ssxtools/ssx3/RID.hpp>
 #include <ssxtools/Types.hpp>
 #include <ssxtools/uint24.hpp>
+#include <ssxtools/OffsetPtr.hpp>
 
 namespace ssxtools::format::ssx3 {
+
+	/// Header of .[*]DB files
+	struct DatabaseHeader {
+
+	};
 
 	struct InterleaveHeader {
 		enum class InterleaveType : u8 {

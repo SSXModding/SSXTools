@@ -63,8 +63,8 @@ namespace ssxtools::core {
 	};
 
 	/// The "hash table" object.
-	struct tBdHashTable {
-		struct Bucket {
+	struct [[gnu::packed]] tBdHashTable {
+		struct [[gnu::packed]] Bucket {
 			u32 hash;
 			u32 objectUid;
 
